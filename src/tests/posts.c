@@ -14,7 +14,6 @@ int test_create_post(void* data)
     assert(strcmp(post->title, "title") == 0);
     assert(strcmp(post->name, "name") == 0);
     assert(strcmp(post->txt, "text") == 0);
-    assert(post->id == 1);
     assert(post->reply_to == 2);
     /* Make sure fields have been guessed correctly */
     assert(! post->is_op);
