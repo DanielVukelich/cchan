@@ -1,11 +1,13 @@
 #include "threads.c"
 #include "posts.c"
+#include "boards.c"
 
 int main(int argc, char **argv) {
     (void) argc;
     (void) argv;
-    run_thread_tests();
     test_posts();
+    run_thread_tests();
+    test_boards();
     return 1;
 }
 
