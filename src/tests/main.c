@@ -8,6 +8,6 @@ int main(int argc, char **argv) {
     test_posts();
     run_thread_tests();
     test_boards();
-    return 1;
+    return 0;
 }
 
