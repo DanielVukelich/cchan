@@ -17,6 +17,7 @@ int test_create_post(void* data)
     assert(post->reply_to == 2);
     /* Make sure fields have been guessed correctly */
     assert(! post->is_op);
+    assert(post->len == strlen("text"));
     free_post(post);
     /* Test default name */
     post = new_post("title", NULL, "text", 1, 2);
@@ -26,6 +27,7 @@ int test_create_post(void* data)
     assert(post->id == 1);
     assert(post->reply_to == 2);
     assert(! post->is_op);
+    assert(post->len == strlen("text"));
     free_post(post);
     /* Create an OP post */
     post = new_post("title", "name", "text", 1, -1);
@@ -35,6 +37,7 @@ int test_create_post(void* data)
     assert(post->id == 1);
     assert(post->reply_to == -1);
     assert(post->is_op);
+    assert(post->len == strlen("text"));
     free_post(post);
     return status;
 }

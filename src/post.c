@@ -25,14 +25,17 @@ Post *new_post(char *title, char *name, char *txt, int id, int reply_to)
     if (txt == NULL) { /* place empty string */
         post->txt = malloc(sizeof(char));
         post->txt[0] = 0;
+        post->len = 1;
     } else {
         size_t txtlen = strlen(txt);
         if (txtlen < MAX_POST_LENGTH) {
             post->txt = malloc(txtlen);
+            post->len = txtlen;
             strncpy(post->txt, txt, txtlen);
         } else {
             post->txt = malloc(MAX_POST_LENGTH * sizeof(char));
             strncpy(post->txt, txt, MAX_POST_LENGTH);
+            post->len = MAX_POST_LENGTH;
         }
     }
     /* set reply to */
