@@ -29,7 +29,7 @@ Post *new_post(char *title, char *name, char *txt, int id, int reply_to)
     } else {
         size_t txtlen = strlen(txt);
         if (txtlen < MAX_POST_LENGTH) {
-            post->txt = malloc(txtlen);
+            post->txt = calloc(txtlen + 1, sizeof(char));
             post->len = txtlen;
             strncpy(post->txt, txt, txtlen);
         } else {
