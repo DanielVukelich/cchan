@@ -30,7 +30,6 @@ void add_post_to_thread(Thread *thread, Post *post)
     if (thread->nreplies >= thread->max_replies) {
         if (thread->flags & THREAD_CYCLIC) {
             /* replace oldest post by new post */
-            free_post(thread->replies[thread->first_post]);
             thread->replies[thread->first_post] = post;
             /* update indices */
             if (thread->first_post >= thread->max_replies - 1) {
