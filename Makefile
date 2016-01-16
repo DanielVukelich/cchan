@@ -1,4 +1,4 @@
-FILES=src/post.c src/thread.c src/board.c
+FILES=src/post.c src/thread.c src/board.c src/render.c
 MAIN=main.c
 TEST_MAIN=src/tests/main.c
 OPTS=-Wall -Wextra -Werror
