@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 extern char *open_post ,
+            *open_postOP,
             *close_div  ,
             *open_name  ,
             *open_title ,
@@ -14,6 +15,7 @@ extern char *open_post ,
             *open_header;
 
 extern size_t open_post_len  ,
+              open_postOP_len,
               close_div_len  ,
               open_name_len  ,
               open_title_len ,
