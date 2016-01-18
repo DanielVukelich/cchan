@@ -9,7 +9,7 @@ int test_create_board(void *data)
 {
     (void) data;
     int status = 1;
-    Board *board = new_board("test", "Test", 1);
+    Board *board = new_board("test", "Test", 1, 0);
     assert(board != NULL);
     assert(strcmp(board->name, "test") == 0);
     assert(strcmp(board->fullname, "Test") == 0);
@@ -26,7 +26,7 @@ int test_add_thread(void *data)
 {
     (void) data;
     int status = 1;
-    Board *board = new_board("test", "TEST", 2);
+    Board *board = new_board("test", "TEST", 2, 0);
     assert(board != NULL);
     Thread *thread = new_thread(NULL, 0, 0);
     /* Add the first thread */

@@ -3,10 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-Board *new_board(char *name, char *fullname, short max_threads)
+Board *new_board(char *name, char *fullname, short max_threads, short flags)
 {
     Board *board = malloc(sizeof(Board));
     board->threads = malloc(sizeof(Thread*) * max_threads);
+    board->flags = flags;
     strncpy(board->name, name, BOARD_NAME_LEN);
     strncpy(board->fullname, fullname, BOARD_FULLNAME_LEN);
     board->post_count = 0;
@@ -18,6 +19,18 @@ Board *new_board(char *name, char *fullname, short max_threads)
 
 void free_board(Board *board)
 {
+    int i, j;
+    if (board->flags & BOARD_AUTO_FREE) {
+        for (i = 0; i < board->max_threads; ++i) {
+            free_post(board->threads[i]->op);
+            for (j = 0; j < board->threads[i]->max_replies; ++j) {
+                if (board->threads[i]->replies[j] != 0) {
+                    free_post(board->threads[i]->replies[j]);
+                }
+            }
+            free_thread(board->threads[i]);
+        }
+    }
     free(board->threads);
     free(board);
 }
