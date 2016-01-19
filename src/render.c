@@ -80,3 +80,31 @@ void render_thread_html(Thread *thread, int filed)
     }
 }
 
+
+void render_post_bin(Post *post, int filed)
+{
+    write(filed, &(post->id), sizeof(post->id));
+    write(filed, &(post->reply_to), sizeof(post->reply_to));
+    write(filed, post->name, MAX_NAME_LENGTH);
+    write(filed, post->title, MAX_TITLE_LENGTH);
+    write(filed, &(post->len), sizeof(post->len));
+    write(filed, post->txt, post->len);
+}
+
+void render_thread_bin(Thread* thread, int filed)
+{
+    short i = 0;
+    /* thread options */
+    write(filed, &(thread->flags), sizeof(thread->flags));
+    write(filed, &(thread->max_replies), sizeof(thread->max_replies));
+    /* thread content */
+    write(filed, &(thread->nreplies), sizeof(thread->nreplies));
+    write(filed, &(thread->first_post), sizeof(thread->first_post));
+    write(filed, &(thread->last_post), sizeof(thread->last_post));
+    /* OP post first */
+    render_post_bin(thread->op, filed);
+    for (; i < thread->nreplies; ++i) {
+        render_post_bin(thread->replies[i], filed);
+    }
+}
+

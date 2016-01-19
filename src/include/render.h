@@ -24,5 +24,12 @@ extern size_t open_post_len  ,
 
 void init_rendering();
 void render_post_html(Post *post, int filed);
+void render_post_bin(Post *post, int filed);
+/* will happen much later
+void render_post_json(Post *post, int filed); */
+
 void render_thread_html(Thread *thread, int filed);
+void render_thread_bin(Thread *thread, int filed);
+/* will happen much later
+void render_thread_json(Thread *thread, int filed); */
 
