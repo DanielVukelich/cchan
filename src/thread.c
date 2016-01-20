@@ -21,6 +21,32 @@ Thread *new_thread(Post* op, short max_replies, short flags)
 
 void free_thread(Thread *thread)
 {
+    if (thread->flags & THREAD_DELPOSTS) {
+        short i;
+        if (thread->flags & THREAD_CYCLIC) {
+            if (thread->nreplies == thread->max_replies) {
+                for (i = 0; i < thread->max_replies; ++i) {
+                    free(thread->replies[i]);
+                }
+            }
+            else if (thread->first_post < thread->last_post) {
+                for (i = thread->first_post; i <= thread->last_post; ++i) {
+                    free(thread->replies[i]);
+                }
+            } else {
+                for (i = thread->first_post; i < thread->max_replies; ++i) {
+                    free(thread->replies[i]);
+                }
+                for (i = 0; i <= thread->last_post; ++i) {
+                    free(thread->replies[i]);
+                }
+            }
+        } else {
+            for (i = 0; i < thread->last_post + 1; ++i) {
+                free(thread->replies[i]);
+            }
+        }
+    }
     free(thread->replies);
     free(thread);
 }
