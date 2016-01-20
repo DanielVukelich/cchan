@@ -62,6 +62,8 @@ void read_thread_bin_noalloc(Thread *thread, int filed)
     for (i = 0; i < thread->nreplies; ++i) {
             add_post_to_thread(thread, read_post_bin(filed));
     }
+    /* set DELPOSTS flag */
+    thread->flags |= THREAD_DELPOSTS;
 }
 
 Thread *read_thread_bin(int filed)
