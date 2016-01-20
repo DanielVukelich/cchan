@@ -62,16 +62,20 @@ void render_post_html(Post *post, int filed)
 
 void render_thread_html(Thread *thread, int filed)
 {
-    int i;
+    short i;
     /* write OP */
     render_post_html(thread->op, filed);
     /* render all replies */
     if (thread->flags & THREAD_CYCLIC) {
-        for (i = thread->first_post; i < thread->max_replies; ++i) {
+        short endpoint = thread->last_post < thread->first_post ?
+            thread->max_replies : thread->last_post + 1;
+        for (i = thread->first_post; i < endpoint; ++i) {
             render_post_html(thread->replies[i], filed);
         }
-        for (i = 0; i < thread->first_post; ++i) {
-            render_post_html(thread->replies[i], filed);
+        if (thread->last_post < thread->first_post) {
+            for (i = 0; i < thread->first_post; ++i) {
+                render_post_html(thread->replies[i], filed);
+            }
         }
     } else {
         for (i = 0; i < thread->nreplies; ++i) {
