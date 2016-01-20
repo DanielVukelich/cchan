@@ -99,8 +99,11 @@ void render_thread_bin(Thread* thread, int filed)
     write(filed, &(thread->max_replies), sizeof(thread->max_replies));
     /* thread content */
     write(filed, &(thread->nreplies), sizeof(thread->nreplies));
-    write(filed, &(thread->first_post), sizeof(thread->first_post));
-    write(filed, &(thread->last_post), sizeof(thread->last_post));
+    /* Q: Why aren't first_post and last_post saved?
+     * A: Because when read again, they will be set to 0
+     *    max_replies - 1, respectively. No need to
+     *    complicate it.
+     * */
     /* OP post first */
     render_post_bin(thread->op, filed);
     for (; i < thread->nreplies; ++i) {

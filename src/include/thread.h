@@ -4,6 +4,7 @@
 
 #define THREAD_BUMPLOCKED 0x0001
 #define THREAD_CYCLIC     0x0002
+#define THREAD_DELPOSTS   0x0004 /* delete posts on free_thread? */
 
 typedef struct {
     Post* op;
