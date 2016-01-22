@@ -1,12 +1,21 @@
-FILES=src/post.c src/thread.c src/board.c src/render.c src/reader.c
-MAIN=main.c
-TEST_MAIN=src/tests/main.c
-OPTS=-Wall -Wextra -Werror
-TEST_OPTS=-g
+SRC=main.c src/post.c src/thread.c src/board.c src/render.c src/reader.c
+OBJECTS=$(SRC:.c=.o)
+CC=gcc
+CFLAGS=-Werror -Wall -Wextra
+LDFLAGS=
 OUT=cchan
-TEST_OUT=testcchan
-LIBS=
-all:
-	gcc -o $(OUT) $(MAIN) $(FILES) $(OPTS) $(LIBS)
-test:
-	gcc -o $(TEST_OUT) $(TEST_MAIN) $(FILES) $(OPTS) $(TEST_OPTS) $(LIBS)
+
+.PHONY:all
+all: cchan
+
+$(OUT): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OUT) $(OBJECTS)
+
+.PHONY: clean
+
