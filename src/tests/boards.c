@@ -1,6 +1,6 @@
-#include "../include/board.h"
-#include "../include/thread.h"
-#include "../include/post.h"
+#include <engine/board.h>
+#include <engine/thread.h>
+#include <engine/post.h>
 
 #include <assert.h>
 #include <string.h>

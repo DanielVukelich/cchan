@@ -1,8 +1,8 @@
 #pragma once
 
-#include "post.h"
-#include "board.h"
-#include "thread.h"
+#include <engine/post.h>
+#include <engine/board.h>
+#include <engine/thread.h>
 
 #include <stdlib.h>
 

@@ -1,5 +1,5 @@
-#include "../include/render.h"
-#include "../include/post.h"
+#include <io/render.h>
+#include <engine/post.h>
 
 #include <unistd.h>
 #include <fcntl.h>

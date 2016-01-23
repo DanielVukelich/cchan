@@ -1,4 +1,4 @@
-#include "include/board.h"
+#include <engine/board.h>
 
 #include <stdlib.h>
 #include <string.h>

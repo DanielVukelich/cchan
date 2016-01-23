@@ -1,4 +1,4 @@
-#include "../include/post.h"
+#include <engine/post.h>
 
 #include <stdio.h>
 #include <stdlib.h>

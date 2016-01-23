@@ -1,8 +1,8 @@
 #pragma once
 
-#include "post.h"
-#include "thread.h"
-#include "board.h"
+#include <engine/post.h>
+#include <engine/thread.h>
+#include <engine/board.h>
 
 void read_post_bin_noalloc(Post *Post, int filed);
 Post *read_post_bin(int filed);
