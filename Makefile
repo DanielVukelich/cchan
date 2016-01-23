@@ -1,21 +1,32 @@
-SRC=main.c src/post.c src/thread.c src/board.c src/render.c src/reader.c
+SRC=src/post.c src/thread.c src/board.c src/render.c src/reader.c
 OBJECTS=$(SRC:.c=.o)
+MAIN=main.c
+MAIN_OBJECT=$(MAIN:.c=.o)
 CC=gcc
 CFLAGS=-Werror -Wall -Wextra
 LDFLAGS=
 OUT=cchan
+TEST_MAIN=src/tests/main.c
+TEST_SRC=
+TEST_OBJECTS=$(TEST_SRC:.c=.o)
+TEST_MAINOBJ=$(TEST_MAIN:.c=.o)
+TEST_LDFLAGS=-g
+TEST_OUT=testcchan
 
 .PHONY:all
-all: cchan
+all: $(OUT) $(TEST_OUT)
 
-$(OUT): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+$(OUT): $(OBJECTS) $(MAIN_OBJECT)
+	$(CC) $(LDFLAGS) $(OBJECTS) $(MAIN_OBJECT) -o $@
+
+$(TEST_OUT): $(OBJECTS) $(TEST_OBJECTS) $(TEST_MAINOBJ)
+	$(CC) $(TEST_LDFLAGS) $(TEST_OBJECTS) $(OBJECTS) $(TEST_MAINOBJ) $(TEST_LDFLAGS) -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OUT) $(OBJECTS)
+	rm -f $(OUT) $(OBJECTS) $(TEST_OUT) $(TEST_OBJECTS) test*
 
 .PHONY: clean
 
