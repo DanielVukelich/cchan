@@ -12,6 +12,8 @@ TEST_OBJECTS=$(TEST_SRC:.c=.o)
 TEST_MAINOBJ=$(TEST_MAIN:.c=.o)
 TEST_LDFLAGS=-g
 TEST_OUT=testcchan
+ALL_OBJECTS=$(TEST_OBJECT) $(TEST_MAINOBJ) $(OBJECTS) $(MAIN_OBJECT)
+ALL_OUT=$(TEST_OUT) $(OUT)
 
 .PHONY:all
 all: $(OUT) $(TEST_OUT)
@@ -26,7 +28,7 @@ $(TEST_OUT): $(OBJECTS) $(TEST_OBJECTS) $(TEST_MAINOBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OUT) $(OBJECTS) $(TEST_OUT) $(TEST_OBJECTS) test*
+	rm -f $(ALL_OUT) $(ALL_OBJECTS) test*
 
 .PHONY: clean
 
