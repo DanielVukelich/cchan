@@ -13,7 +13,7 @@ int test_render_post(void *data)
     int file_perm_flags = S_IRUSR | S_IWUSR;
     int file = open("test_render_post", O_CREAT | O_RDWR, file_perm_flags);
     /* create a dummy post */
-    Post *post = new_post("Title", "Name", "Text", 0, -1);
+    Post *post = new_post("Title", "Name", "Text", 0, -1, 0);
     /* write post on file */
     render_post_html(post, file);
     /* clean and close */
@@ -28,10 +28,10 @@ int test_render_thread(void *data)
     int status = 1;
     int fd, perms = S_IRUSR | S_IWUSR;
     /* create dummy objects */
-    Post *op = new_post("TitleOP", "NameOP", "TextOP", 1, -1);
-    Post *r1 = new_post("Title1", "Name1", "Text1", 2, 1);
-    Post *r2 = new_post("Title2", "Name2", "Text2", 3, 1);
-    Post *r3 = new_post("Title3", "Name3", "Text3", 4, 1);
+    Post *op = new_post("TitleOP", "NameOP", "TextOP", 1, -1, 0);
+    Post *r1 = new_post("Title1", "Name1", "Text1", 2, 1, 0);
+    Post *r2 = new_post("Title2", "Name2", "Text2", 3, 1, 0);
+    Post *r3 = new_post("Title3", "Name3", "Text3", 4, 1, 0);
     /* first with non cyclical thread */
     Thread *thread = new_thread(op, 2, 0);
     add_post_to_thread(thread, r1);
@@ -65,8 +65,8 @@ int test_render_thread_bin(void *data)
     int status = 1;
     int perms = S_IRUSR | S_IWUSR;
     /* Create dummy posts */
-    Post *post1 = new_post("Title1", "Name1", "Text1", 0, -1);
-    Post *post2 = new_post("Title2", "Name2", "Text2", 1, 0);
+    Post *post1 = new_post("Title1", "Name1", "Text1", 0, -1, 0);
+    Post *post2 = new_post("Title2", "Name2", "Text2", 1, 0, 0);
     Thread *thread = new_thread(post1, 10, 0);
     add_post_to_thread(thread, post2);
     int filed = open("test_render_thread_bin", O_CREAT | O_RDWR, perms);
@@ -84,7 +84,7 @@ int test_render_post_bin(void* data)
     (void) data;
     int status = 0;
     int perms = S_IWUSR | S_IRUSR;
-    Post *post = new_post("Name", "Title", "Test", 0, -1);
+    Post *post = new_post("Name", "Title", "Test", 0, -1, 0);
     int filed = open("test_render_post_bin", O_CREAT | O_RDWR, perms);
     render_post_bin(post, filed);
     close(filed);

@@ -1,5 +1,6 @@
 include ../../Makefile.inc
 
+SRC=files.c
 OBJECTS=$(SRC:.c=.o)
 
 .PHONY: all

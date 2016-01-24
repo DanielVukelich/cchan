@@ -9,7 +9,7 @@ int test_create_post(void* data)
 {
     (void) data;
     int status = 1;
-    Post *post = new_post("title", "name", "text", 1, 2);
+    Post *post = new_post("title", "name", "text", 1, 2, 0);
     /* Make sure fields have been set correctly */
     assert(strcmp(post->title, "title") == 0);
     assert(strcmp(post->name, "name") == 0);
@@ -20,7 +20,7 @@ int test_create_post(void* data)
     assert(post->len == strlen("text"));
     free_post(post);
     /* Test default name */
-    post = new_post("title", NULL, "text", 1, 2);
+    post = new_post("title", NULL, "text", 1, 2, 0);
     assert(strcmp(post->name, "Anonymous") == 0);
     assert(strcmp(post->title, "title") == 0);
     assert(strcmp(post->txt, "text") == 0);
@@ -30,7 +30,7 @@ int test_create_post(void* data)
     assert(post->len == strlen("text"));
     free_post(post);
     /* Create an OP post */
-    post = new_post("title", "name", "text", 1, -1);
+    post = new_post("title", "name", "text", 1, -1, 0);
     assert(strcmp(post->name, "name") == 0);
     assert(strcmp(post->title, "title") == 0);
     assert(strcmp(post->txt, "text") == 0);

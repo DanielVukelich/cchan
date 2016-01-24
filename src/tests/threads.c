@@ -28,8 +28,8 @@ int test_add_post(void *data)
     (void) data;
     int status = 1;
     /* create posts */
-    Post *op = new_post("nameOP", "titleOP", "textOP", 0, -1);
-    Post *reply = new_post("name", "title", "text", 1, 0);
+    Post *op = new_post("nameOP", "titleOP", "textOP", 0, -1, 0);
+    Post *reply = new_post("name", "title", "text", 1, 0, 0);
     Thread *thread = new_thread(op, 150, 0);
     add_post_to_thread(thread, reply);
     assert(thread->nreplies == 1);
@@ -45,7 +45,7 @@ int test_thread_full(void* data) {
     (void) data;
     int status = 1;
     /* create dummy post */
-    Post *post = new_post("title", "name", "text", 0, 0);
+    Post *post = new_post("title", "name", "text", 0, 0, 0);
     Thread *thread = new_thread(NULL, 1, 0);
     add_post_to_thread(thread, post);
     add_post_to_thread(thread, post);
