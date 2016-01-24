@@ -7,7 +7,7 @@ $(SRC):
 	$(MAKE) -C $@
 
 clean:
-	$(MAKE) -C $(SRC) clean
+	$(MAKE) clean -C $(SRC)
 
 force_look:
 	true
