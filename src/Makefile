@@ -9,8 +9,11 @@ OBJECTS=$(foreach dir, $(DIRS), $(wildcard $(dir)/*.o))
 all: $(TARGET)
 	mv $(TARGET) ..
 
-$(TARGET): $(DIRS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $(TARGET)
+$(TARGET): $(DIRS) main.o
+	$(CC) $(LDFLAGS) $(OBJECTS) main.o -o $(TARGET)
+
+main.o:
+	$(CC) -o $@ -c main.c $(CFLAGS) -Iinclude/
 
 $(DIRS):
 	$(MAKE) -C $@
