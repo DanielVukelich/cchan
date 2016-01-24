@@ -11,7 +11,5 @@ $(DIRS):
 	$(MAKE) -C $@
 
 clean:
-	for dir in $(DIRS); do\
-		$(MAKE) $@ -C $$dir;\
-	done
+	for dir in $(DIRS); do $(MAKE) $@ -C $$dir; done
 

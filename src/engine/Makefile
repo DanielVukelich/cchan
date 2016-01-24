@@ -11,5 +11,5 @@ all: $(OBJECTS)
 	$(CC) $(CFLAGS) -c -I$(INCLUDE_DIR) $< -o $@
 
 clean:
-	-rm $(OBJECTS)
+	$(RM) -f $(OBJECTS)
 
