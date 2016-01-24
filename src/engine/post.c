@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-Post *new_post(char *title, char *name, char *txt, int id, int reply_to)
+Post *new_post(char *title, char *name, char *txt, int id, int reply_to, int flags)
 {
     Post *post = malloc(sizeof(Post));
     /* set name */
@@ -48,6 +48,8 @@ Post *new_post(char *title, char *name, char *txt, int id, int reply_to)
     }
     /* set id */
     post->id = id;
+    /* set flags */
+    post->flags = flags;
     return post;
 }
 

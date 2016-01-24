@@ -14,6 +14,7 @@ void read_post_bin_noalloc(Post *post, int filed)
     /* Read from file */
     read(filed, &(post->id), sizeof(post->id));
     read(filed, &(post->reply_to), sizeof(post->reply_to));
+    read(filed, &(post->flags), sizeof(post->flags));
     read(filed, post->name, MAX_NAME_LENGTH);
     read(filed, post->title, MAX_TITLE_LENGTH);
     read(filed, &(post->len), sizeof(post->len));
@@ -30,7 +31,7 @@ void read_post_bin_noalloc(Post *post, int filed)
 Post *read_post_bin(int filed)
 {
     /* TODO: this is poor performance but it avoids bugs tbqh */
-    Post* post = new_post(" ", " ", " ", 0, 0);
+    Post* post = new_post(" ", " ", " ", 0, 0, 0);
     read_post_bin_noalloc(post, filed);
     return post;
 }

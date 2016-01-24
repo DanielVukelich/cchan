@@ -89,6 +89,7 @@ void render_post_bin(Post *post, int filed)
 {
     write(filed, &(post->id), sizeof(post->id));
     write(filed, &(post->reply_to), sizeof(post->reply_to));
+    write(filed, &(post->flags), sizeof(post->flags));
     write(filed, post->name, MAX_NAME_LENGTH);
     write(filed, post->title, MAX_TITLE_LENGTH);
     write(filed, &(post->len), sizeof(post->len));
