@@ -5,3 +5,6 @@ MAIN_SRC=main.c
 RM=rm
 CFLAGS=-Wall -Wextra -Werror
 INCLUDE_DIR=../include
+TARGET=cchan
+LD=gcc
+LDFLAGS=
