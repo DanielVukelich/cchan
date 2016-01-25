@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-DIRS=engine io tests
+DIRS=engine io tests util net
 OBJECTS=$(foreach dir, $(DIRS), $(wildcard $(dir)/*.o))
 
 .PHONY: all $(DIRS)
@@ -20,4 +20,5 @@ $(DIRS):
 
 clean:
 	for dir in $(DIRS); do $(MAKE) clean -C $$dir; done
+	rm main.o
 

@@ -4,12 +4,12 @@
 
 Thread *new_thread(Post* op, short max_replies, short flags)
 {
+    int i;
     Thread *thread = malloc(sizeof(Thread));
     thread->op = op;
     thread->replies = malloc(sizeof(Post*) * max_replies);
     thread->max_replies = max_replies;
     thread->nreplies = 0;
-    int i;
     for (i = 0; i < max_replies; ++i) {
         thread->replies[i] = NULL;
     }

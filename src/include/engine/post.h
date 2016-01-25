@@ -12,13 +12,13 @@ static const unsigned int MAX_TITLE_LENGTH = 128;
 
 typedef struct {
     int is_op;
-    char *name;  // field 0
-    char *title; // field 1
-    char *txt;   // field 2
+    char *name;  /* field 0 */
+    char *title; /* field 1 */
+    char *txt;   /* field 2 */
     int len;
-    int id;      // field 3
-    int reply_to;// field 4
-    int flags;   // field 5
+    int id;      /* field 3 */
+    int reply_to;/* field 4 */
+    int flags;   /* field 5 */
 } Post;
 
 Post* new_post(char *title, char *name, char *txt, int id, int reply_to, int flags);
