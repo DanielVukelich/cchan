@@ -9,3 +9,6 @@
         || (x) == '_' || (x) == '`' \
         || (x) == '|' || (x) == '~')
 
+/* print the line and show where the error is*/
+void point_error_in_line(char buffer[], int currentpos);
+

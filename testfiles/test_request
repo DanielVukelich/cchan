@@ -1,2 +1,8 @@
-GET /LETEST HTTP/1.1
-Host: foo.bar
+GET /tech/thread/123456?fagmode=true HTTP/1.1
+Host: banis
+TestHeader: test
+jsifj ///8790890n s9ag
+
+
+BODYYYYYYYYYYYYYYYYYYYYYYYY
+
