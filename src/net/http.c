@@ -254,6 +254,7 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     if (nextchar == '\n') {
                         first_level_state = AUTOST_LF_STARTL;
                     } else {
+                        puts("Parsing post-startline CR");
                         parseerror("expected LF.");
                         first_level_state = AUTOST_ERR_BADREQ;
                     }
@@ -266,6 +267,7 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     } else if (nextchar == '\r') {  /* no headers, second empty line */
                         first_level_state = AUTOST_HEADER_CR2;
                     } else {
+                        puts("Parsing post-startline LF");
                         parseerror("expected token character or CR");
                         first_level_state = AUTOST_ERR_BADREQ;
                     }
@@ -282,56 +284,77 @@ HTTPRequest *parse_HTTPRequest(int filed)
                             } else if (is_http_tchar(nextchar)) {
                                 ;
                             } else {
+                                puts("Parsing header's field name");
                                 parseerror("expected token character or ':'.");
                                 first_level_state = AUTOST_ERR_BADREQ;
                             }
                             break;
+
                         case AUTOST_HE_COLON:
-                            if (isspace(nextchar)) {
+                            if (is_http_ws(nextchar)) {
                                 second_level_state = AUTOST_HE_OWS1;
                             } else if (is_http_tchar(nextchar)) {
                                 second_level_state = AUTOST_HE_FV;
                             } else {
+                                puts("Parsing header colon.");
                                 parseerror("expected token character or OWS.");
                                 first_level_state = AUTOST_ERR_BADREQ;
                             }
                             break;
+
                         case AUTOST_HE_OWS1:
                             if (isgraph(nextchar)) {
                                 second_level_state = AUTOST_HE_FV;
-                            } else if (isspace(nextchar)) {
+                            } else if (is_http_ws(nextchar)) {
                                 ; /* do nothing */
                             } else {
+                                puts("Parsing header's post-colon OWS");
                                 parseerror("expected VCHAR or OWS.");
                                 first_level_state = AUTOST_ERR_BADREQ;
                             }
                             break;
+
                         case AUTOST_HE_FV:
                             header_fieldvalue[j++] = thischar;
                             if (isgraph(nextchar)) {
                                 ;
-                            } else if (isspace(nextchar)) {
+                            } else if (is_http_ws(nextchar)) {
                                 header_fieldvalue[j] = '\0';
+                                puts("Got header:");
+                                puts(header_fieldname);
+                                puts(header_fieldvalue);
+                                puts("");
                                 j = 0;
                                 second_level_state = AUTOST_HE_FVSP;
+                            } else if (nextchar == '\r') {
+                                header_fieldvalue[j] = '\0';
+                                puts("Got header:");
+                                puts(header_fieldname);
+                                puts(header_fieldvalue);
+                                j = 0;
+                                first_level_state = AUTOST_HEADER_CR;
                             } else {
+                                puts("Parsing header's field value");
                                 parseerror("expected VCHAR or SP/HTAB.");
                                 first_level_state = AUTOST_ERR_BADREQ;
                             }
                             break;
+
                         case AUTOST_HE_FVSP:
                             if (isgraph(nextchar)) {
                                 second_level_state = AUTOST_HE_FV;
                                 /* TODO: create new field value buffer */
-                            } else if (isspace(nextchar)){
+                            } else if (is_http_ws(nextchar)){
                                 ; /* do nothing */
                             } else if (nextchar == '\r') {
                                 first_level_state = AUTOST_HEADER_CR;
                             } else {
+                                puts("Parsing header's field value space");
                                 parseerror("expected VCHAR, CR or SP/HTAB.");
                                 first_level_state = AUTOST_ERR_BADREQ;
                             }
                             break;
+
                         default: /* should not happen */
                             break;
                     };
@@ -341,6 +364,8 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     if (nextchar == '\n' ) {
                         first_level_state = AUTOST_HEADER_LF;
                     } else {
+                        puts("Parsing header's first CR");
+                        parseerror("expected LF.");
                         first_level_state = AUTOST_ERR_BADREQ;
                     }
                     break;
@@ -352,6 +377,7 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     } else if (nextchar == '\r') { /* second empty line */
                         first_level_state = AUTOST_HEADER_CR2;
                     } else {
+                        puts("Parsing header's first LF.");
                         parseerror("expected token character or CR.");
                         first_level_state = AUTOST_ERR_BADREQ;
                     }
@@ -361,6 +387,7 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     if (nextchar == '\n') {
                         first_level_state = AUTOST_HEADER_LF2;
                     } else {
+                        puts("Parsing header's second CR");
                         parseerror("expected LF.");
                         first_level_state = AUTOST_ERR_BADREQ;
                     }
