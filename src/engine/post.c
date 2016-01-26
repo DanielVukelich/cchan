@@ -45,7 +45,6 @@ Post *new_post(char *title, char *name, char *txt, int id, int reply_to, int fla
         strncpy(post->name, "Anonymous", MAX_NAME_LENGTH);
     } else {
         parse_tripcode(name, post);
-	/*        strncpy(post->name, name, MAX_NAME_LENGTH); */
     }
     /* set title */
     post->title = malloc(sizeof(char) * MAX_TITLE_LENGTH);
