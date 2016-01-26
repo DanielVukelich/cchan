@@ -1,8 +1,40 @@
 #include <engine/post.h>
 
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+void parse_tripcode(const char *name, Post *post)
+{
+    int symbol_pos;
+    const char* secret;
+    char *srch = strpbrk(name, "#");
+    
+    /* Search for a # symbol.  If not found, there's no tripcode */
+    if(srch == NULL){
+	post->trip.hmac_size = 0;
+	post->trip.tripcode_hmac = NULL;
+        strncpy(post->name, name, MAX_NAME_LENGTH);
+	return;
+    }
+
+    /* Get the name part of the field */
+    symbol_pos = srch - name;
+    strncpy(post->name, name, symbol_pos);
+    post->name[symbol_pos] = '\0';
+
+    /*  Get everything ready to hash */
+    secret = name + symbol_pos + 1;
+    post->trip.tripcode_hmac = malloc(sizeof(unsigned char) * MAX_HMAC_LENGTH);
+
+    /* Compute the HMAC using SHA512 */
+    HMAC(EVP_sha512(), secret, strlen(secret), (unsigned char *) post->name, strlen(post->name), post->trip.tripcode_hmac, &(post->trip.hmac_size));
+    
+    return;    
+}
 
 Post *new_post(char *title, char *name, char *txt, int id, int reply_to, int flags)
 {
@@ -12,7 +44,7 @@ Post *new_post(char *title, char *name, char *txt, int id, int reply_to, int fla
     if (name == NULL) { /* set "Anonymous" as a name */
         strncpy(post->name, "Anonymous", MAX_NAME_LENGTH);
     } else {
-        strncpy(post->name, name, MAX_NAME_LENGTH);
+        parse_tripcode(name, post);
     }
     /* set title */
     post->title = malloc(sizeof(char) * MAX_TITLE_LENGTH);
@@ -55,6 +87,9 @@ Post *new_post(char *title, char *name, char *txt, int id, int reply_to, int fla
 
 void free_post(Post *post)
 {
+    if(post->trip.hmac_size)
+	free(post->trip.tripcode_hmac);
+    
     free(post->txt);
     free(post->name);
     free(post->title);

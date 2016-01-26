@@ -8,7 +8,7 @@ OBJECTS=$(SRC:.c=.o)
 all: $(OBJECTS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -I$(INCLUDE_DIR) $< -o $@
+	$(CC) $(CFLAGS) -c -I$(INCLUDE_DIR) $< $(LDLIBS) -o $@
 
 clean:
 	$(RM) -f $(OBJECTS)

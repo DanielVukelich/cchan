@@ -8,3 +8,4 @@ INCLUDE_DIR=../include
 TARGET=cchan
 LD=gcc
 LDFLAGS=
+LDLIBS=-lcrypto
