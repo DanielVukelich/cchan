@@ -10,7 +10,7 @@ all: $(TARGET)
 	mv $(TARGET) ..
 
 $(TARGET): $(DIRS) main.o
-	$(CC) $(LDFLAGS) $(OBJECTS) main.o -o $(TARGET)
+	$(CC) $(LDFLAGS) $(OBJECTS) main.o $(LDLIBS) -o $(TARGET)
 
 main.o:
 	$(CC) -o $@ -c main.c $(CFLAGS) -Iinclude/
