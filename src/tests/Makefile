@@ -10,4 +10,3 @@ all: $(OBJECTS)
 
 clean:
 	$(RM) -f $(OBJECTS)
-
