@@ -14,4 +14,4 @@ No installation atm, just play with the files the way it works tbqh lad
 Once compiled, run "./cchan".
 NOTE: this does nothing but accept a connection and return a 404 HTTP response.
 
-COPYRIGHT (C) $CURRENT_YEAR shamoanjac Inc.
+COPYRIGHT (C) 2016 the C-chan contributors.
