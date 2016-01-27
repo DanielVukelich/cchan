@@ -76,7 +76,7 @@ typedef struct {
 
 typedef struct {
     char *primary_tag;
-    char *subtag;
+    char **subtags;
     int n_subtags;
 } http_LanguageToken;
 

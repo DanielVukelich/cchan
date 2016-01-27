@@ -61,7 +61,7 @@ HTTPRequest *new_HTTPRequest()
     req->host.port = 0;
     req->host.name = NULL;
     req->accept_language.primary_tag = NULL;
-    req->accept_language.subtag = NULL;
+    req->accept_language.subtags = NULL;
     req->accept_language.n_subtags = 0;
     req->accept_date.day = 0;
     req->accept_date.month = 0;
@@ -86,7 +86,59 @@ HTTPRequest *new_HTTPRequest()
 
 void free_HTTPRequest(HTTPRequest *req)
 {
+    int i;
     /* TODO: free everything if non-NULL */
+    if (req->protocol.name != NULL) {
+        free(req->protocol.name);
+    }
+    if (req->protocol.version != NULL) {
+        free(req->protocol.version);
+    }
+    if (req->target != NULL) {
+        free(req->target);
+    }
+    if (req->host.name != NULL) {
+        free(req->host.name);
+    }
+    if (req->accept_language.primary_tag != NULL) {
+        free(req->accept_language.primary_tag);
+    }
+    if (req->accept_language.subtags != NULL) {
+        for (i = 0; i < req->accept_language.n_subtags; ++i) {
+            free(req->accept_language.subtags[i]);
+        }
+        free(req->accept_language.subtags);
+    }
+    if (req->user_agent.products != NULL) {
+        for (i = 0; i < req->user_agent.nproducts; ++i) {
+            free(req->user_agent.products + i);
+        }
+        free(req->user_agent.products);
+    }
+    if (req->user_agent.comments != NULL) {
+        for (i = 0; i < req->user_agent.ncomments; ++i) {
+            free(req->user_agent.comments[i]);
+        }
+        free(req->user_agent.comments);
+    }
+    if (req->upgrade.name != NULL) {
+        free(req->upgrade.name);
+    }
+    if (req->upgrade.version != NULL) {
+        free(req->upgrade.version);
+    }
+    if (req->referer != NULL) {
+        free(req->referer);
+    }
+    if (req->origin != NULL) {
+        free(req->origin);
+    }
+    if (req->from != NULL) {
+        free(req->from);
+    }
+    if (req->body != NULL) {
+        free(req->body);
+    }
     free(req);
 }
 
@@ -124,7 +176,12 @@ HTTPRequest *parse_HTTPRequest(int filed)
                         case AUTOST_SL_METHOD:
                             method[j++] = thischar;
                             if (is_http_tchar(nextchar)) {
-                                ;
+                                /* make sure the method length isn't too long */
+                                if (j >= MAX_METHOD_LEN - 2) {
+                                    puts("Parsing method.");
+                                    parseerror("Excessive method length.");
+                                    first_level_state = AUTOST_ERR_BADREQ;
+                                }
                             } else if (nextchar == ' ') {
                                 method[j] = '\0'; /* finish writing method */
                                 j = 0;
@@ -164,7 +221,11 @@ HTTPRequest *parse_HTTPRequest(int filed)
                         case AUTOST_SL_TARGET:
                             target[j++] = thischar;
                             if (isgraph(nextchar)) {
-                                ;
+                                if (j >= MAX_TARGET_LEN - 2) {
+                                    puts("Parsing target.");
+                                    parseerror("Excessive target length");
+                                    first_level_state = AUTOST_ERR_BADREQ;
+                                }
                             } else if (nextchar == ' ') {
                                 target[j] = '\0';
                                 j = 0;
@@ -277,6 +338,11 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     switch (second_level_state) {
                         case AUTOST_HE_FN:
                             header_fieldname[j++] = thischar;
+                            if (j >= MAX_HEADER_FN_LEN - 2) {
+                                puts("Parsing header's file name.");
+                                parseerror("Excessive header field name length.");
+                                first_level_state = AUTOST_ERR_BADREQ;
+                            }
                             if (nextchar == ':') {
                                 header_fieldname[j] = '\0';
                                 j = 0;
@@ -316,6 +382,11 @@ HTTPRequest *parse_HTTPRequest(int filed)
 
                         case AUTOST_HE_FV:
                             header_fieldvalue[j++] = thischar;
+                            if (j >= MAX_HEADER_FV_LEN -2 ) {
+                                puts("Parsing header's field value.");
+                                parseerror("Excessive field value length.");
+                                first_level_state = AUTOST_ERR_BADREQ;
+                            }
                             if (isgraph(nextchar)) {
                                 ;
                             } else if (is_http_ws(nextchar)) {
@@ -398,7 +469,12 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     break;
 
                 case AUTOST_BODY: /* just accept tbqh fam */
+                    /* TODO: dis gun need sum serious work bc it's underoptimized af*/
                     body[j++] = thischar;
+                    if (j >= MAX_BODY_LEN - 2) {
+                        puts("Excessive body length.");
+                        first_level_state = AUTOST_ERR_BADREQ;
+                    }
                     ++ bodylen;
                     break;
 
