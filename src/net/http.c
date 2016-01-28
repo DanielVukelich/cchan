@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -50,6 +51,7 @@
 
 /* error macros */
 #define parseerror(x) puts("Parsing error: "x)
+#define methoderror(x,y) puts(x" method: "); puts(y); free(request); return NULL
 
 HTTPRequest *new_HTTPRequest()
 {
@@ -161,6 +163,8 @@ HTTPRequest *parse_HTTPRequest(int filed)
         bodylen = 0; /* length of body */
     int first_level_state = AUTOST_START_LINE,
         second_level_state = AUTOST_SL_METHOD;
+    int aux_ret = 0; /* used to retrieve the value of some function for
+    checking purposes */
     /* buffers */
     do {
         n_chars_read = read(filed, buffer, BLOCK_SIZE);
@@ -325,6 +329,9 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     if (is_http_tchar(nextchar) ) { /* token character, header */
                         first_level_state = AUTOST_HEADER;
                         second_level_state = AUTOST_HE_FN;
+                        /* save last header, write this one*/
+                        /* check if generic header */
+                        /* if not, write into custom headers */
                     } else if (nextchar == '\r') {  /* no headers, second empty line */
                         first_level_state = AUTOST_HEADER_CR2;
                     } else {
@@ -445,6 +452,12 @@ HTTPRequest *parse_HTTPRequest(int filed)
                     if (is_http_tchar(nextchar) ) { /* token, therefore field name */
                         first_level_state = AUTOST_HEADER;
                         second_level_state = AUTOST_HE_FN;
+                        aux_ret = parse_header(request, header_fieldname, header_fieldvalue);
+                        if (! aux_ret) {
+                            ;/* TODO: save header, realloc, etc. */
+                        } else {
+                            ; /* nothing tbh fam */
+                        }
                     } else if (nextchar == '\r') { /* second empty line */
                         first_level_state = AUTOST_HEADER_CR2;
                     } else {
@@ -489,13 +502,51 @@ HTTPRequest *parse_HTTPRequest(int filed)
             }
         } /* reading block "for" loop */
     } while (! done);
+    request->method = get_http_method(method);
+    if (request->method == INVALID_METHOD) {
+        methoderror("Invalid", method);
+    }
+    /* --- TODO: check if request is valid --- */
     /* --- write collected info to request --- */
-    puts(method);
-    puts(target);
-    (void) header_fieldname;
-    (void) header_fieldvalue;
-    puts(protocol);
     (void) body;
+    (void) protocol;
+    request->target = malloc(sizeof(char) * strlen(target) + 1);
+    strcpy(request->target, target);
     return request;
+}
+
+
+/* return 1 if header was standard, 0 if it was custom*/
+int parse_header(HTTPRequest *req, char name[], char value[])
+{
+    /* check header name */
+    /* TODO: check for headers validity */
+    if (strcasecmp(name, "host") == 0){ /* host, should be first header */
+        parse_http_Host(&(req->host), value);
+    } else if (strcasecmp(name, "accept-language") == 0) {
+        parse_http_LanguageToken(&(req->accept_language), value);
+    } else if (strcasecmp(name, "accept-date") == 0) {
+        parse_http_Date(&(req->accept_date), value);
+    } else if (strcasecmp(name, "connection") == 0) {
+        parse_http_ConnectionType(&(req->connection), value);
+    } else if (strcasecmp(name, "user-agent") == 0) {
+        parse_http_UserAgent(&(req->user_agent), value);
+    } else if (strcasecmp(name, "upgrade") == 0) {
+        parse_http_ProductToken(&(req->upgrade), value);
+    } else if (strcasecmp(name, "referer") == 0) {
+        req->referer = malloc(sizeof(char) * strlen(value) + 1);
+        strcpy(req->referer, value);
+    } else if (strcasecmp(name, "origin") == 0) {
+        req->origin = malloc(sizeof(char) * strlen(value) + 1);
+        strcpy(req->origin, value);
+    } else if (strcasecmp(name, "from") == 0) {
+        req->origin = malloc(sizeof(char) * strlen(value) + 1);
+        strcpy(req->from, value);
+    } else if (strcasecmp(name, "content-length")) {
+        req->content_length = atoi(value);
+    } else {
+        return 1;
+    }
+    return 0;
 }
 

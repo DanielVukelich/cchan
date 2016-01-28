@@ -19,8 +19,8 @@ typedef struct {
     http_LanguageToken accept_language;
     http_Date         accept_date;
     /* other */
-    httpheader_Connection connection;
-    httpheader_UserAgent user_agent;
+    http_ConnectionType connection;
+    http_UserAgent user_agent;
     http_ProductToken upgrade;
     char *referer;
     char *origin;
@@ -45,4 +45,8 @@ HTTPRequest *new_HTTPRequest();
 HTTPRequest *parse_HTTPRequest(int filed);
 
 void free_HTTPRequest(HTTPRequest *request);
+
+/* return 1 if header was standard, 0 otherwise*/
+int parse_header(HTTPRequest *request, char name[], char value[]);
+
 

@@ -8,6 +8,8 @@
 #define MAX_BACKWARDS 40
 #define MAX_FORWARDS  40
 
+#include <string.h>
+
 void point_error_in_line(char buffer[], int currentpos)
 {
     int firstc = currentpos,
@@ -45,5 +47,30 @@ void point_error_in_line(char buffer[], int currentpos)
         }
     }
     puts(line);
+}
+
+http_method get_http_method(char str[])
+{
+    if (strcmp(str, "GET") == 0) {
+        return GET;
+    } else if (strcmp(str, "HEAD") == 0) {
+        return HEAD;
+    } else if (strcmp(str, "POST") == 0) {
+        return POST;
+    } else if (strcmp(str, "PUT") == 0) {
+        return PUT;
+    } else if (strcmp(str, "DELETE") == 0) {
+        return DELETE;
+    } else if (strcmp(str, "TRACE") == 0) {
+        return TRACE;
+    } else if (strcmp(str, "OPTIONS") == 0) {
+        return OPTIONS;
+    } else if (strcmp(str, "CONNECT") == 0) {
+        return CONNECT;
+    } else if (strcmp(str, "PATCH") == 0) {
+        return PATCH;
+    } else {
+        return INVALID_METHOD;
+    }
 }
 
