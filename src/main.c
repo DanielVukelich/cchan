@@ -15,14 +15,14 @@ int main(int argc, char **argv)
     }
     (void) argc;
     (void) argv;
-/*    puts("\nmethod:");
+    puts("\nmethod:");
     printf("%d\n", request->method);
     puts("\ntarget:");
     puts(request->target);
     puts("\nprotocol:");
     puts(request->protocol.name);
     puts("\nprotocol version:");
-    puts(request->protocol.version);*/
+    puts(request->protocol.version);
     free_HTTPRequest(request);
     close(filed);
     return EXIT_SUCCESS;

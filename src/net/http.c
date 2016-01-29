@@ -1,6 +1,7 @@
 #include <net/http.h>
 #include <net/headers.h>
 #include <util/http.h>
+#include <util/strings.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -398,17 +399,10 @@ HTTPRequest *parse_HTTPRequest(int filed)
                                 ;
                             } else if (is_http_ws(nextchar)) {
                                 header_fieldvalue[j] = '\0';
-                                puts("Got header:");
-                                puts(header_fieldname);
-                                puts(header_fieldvalue);
-                                puts("");
                                 j = 0;
                                 second_level_state = AUTOST_HE_FVSP;
                             } else if (nextchar == '\r') {
                                 header_fieldvalue[j] = '\0';
-                                puts("Got header:");
-                                puts(header_fieldname);
-                                puts(header_fieldvalue);
                                 j = 0;
                                 first_level_state = AUTOST_HEADER_CR;
                             } else {
@@ -421,7 +415,6 @@ HTTPRequest *parse_HTTPRequest(int filed)
                         case AUTOST_HE_FVSP:
                             if (isgraph(nextchar)) {
                                 second_level_state = AUTOST_HE_FV;
-                                /* TODO: create new field value buffer */
                             } else if (is_http_ws(nextchar)){
                                 ; /* do nothing */
                             } else if (nextchar == '\r') {
@@ -502,6 +495,12 @@ HTTPRequest *parse_HTTPRequest(int filed)
             }
         } /* reading block "for" loop */
     } while (! done);
+    /* parse last header */
+    if (! parse_header(request, header_fieldname, header_fieldvalue)) {
+        /* TODO: save header */
+    } else {
+        ; /* nothing */
+    }
     request->method = get_http_method(method);
     if (request->method == INVALID_METHOD) {
         methoderror("Invalid", method);
@@ -509,9 +508,8 @@ HTTPRequest *parse_HTTPRequest(int filed)
     /* --- TODO: check if request is valid --- */
     /* --- write collected info to request --- */
     (void) body;
-    (void) protocol;
-    request->target = malloc(sizeof(char) * strlen(target) + 1);
-    strcpy(request->target, target);
+    parse_http_ProductToken(&(request->protocol), protocol);
+    str_alloc_and_copy(&(request->target), target);
     return request;
 }
 
@@ -540,7 +538,7 @@ int parse_header(HTTPRequest *req, char name[], char value[])
         req->origin = malloc(sizeof(char) * strlen(value) + 1);
         strcpy(req->origin, value);
     } else if (strcasecmp(name, "from") == 0) {
-        req->origin = malloc(sizeof(char) * strlen(value) + 1);
+        req->from = malloc(sizeof(char) * strlen(value) + 1);
         strcpy(req->from, value);
     } else if (strcasecmp(name, "content-length")) {
         req->content_length = atoi(value);
