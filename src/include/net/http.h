@@ -1,7 +1,5 @@
 #pragma once
 
-#define HTTP_BUFFER_SIZE 2048
-
 #include "headers.h"
 
 #include <stdlib.h>
@@ -19,8 +17,8 @@ typedef struct {
     http_LanguageToken accept_language;
     http_Date         accept_date;
     /* other */
-    httpheader_Connection connection;
-    httpheader_UserAgent user_agent;
+    http_ConnectionType connection;
+    http_UserAgent user_agent;
     http_ProductToken upgrade;
     char *referer;
     char *origin;
@@ -29,11 +27,6 @@ typedef struct {
     /* request body */
     char* body;
 } HTTPRequest;
-
-typedef struct {
-    int socket_fd;
-    char buffer[HTTP_BUFFER_SIZE];
-} HTTPServerSocket;
 
 /* 
  * Create an empty HTTP request with empty fields
@@ -45,4 +38,8 @@ HTTPRequest *new_HTTPRequest();
 HTTPRequest *parse_HTTPRequest(int filed);
 
 void free_HTTPRequest(HTTPRequest *request);
+
+/* return 1 if header was standard, 0 otherwise*/
+int parse_header(HTTPRequest *request, char name[], char value[]);
+
 

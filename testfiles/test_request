@@ -1,3 +1,5 @@
 GET /tech/thread/123456?fagmode=true HTTP/1.1
+Host: localhost:80
 TestHeader:test
+Connection: keep-alive
 

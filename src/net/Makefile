@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-SRC=http.c
+SRC=http.c headers.c server.c handlers.c
 OBJECTS=$(SRC:.c=.o)
 
 .PHONY: all
