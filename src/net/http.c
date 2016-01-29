@@ -166,7 +166,6 @@ HTTPRequest *parse_HTTPRequest(int filed)
         second_level_state = AUTOST_SL_METHOD;
     int aux_ret = 0; /* used to retrieve the value of some function for
     checking purposes */
-    /* buffers */
     do {
         n_chars_read = read(filed, buffer, BLOCK_SIZE);
         if (n_chars_read < BLOCK_SIZE) { /* reading last block of file */
@@ -532,14 +531,11 @@ int parse_header(HTTPRequest *req, char name[], char value[])
     } else if (strcasecmp(name, "upgrade") == 0) {
         parse_http_ProductToken(&(req->upgrade), value);
     } else if (strcasecmp(name, "referer") == 0) {
-        req->referer = malloc(sizeof(char) * strlen(value) + 1);
-        strcpy(req->referer, value);
+        str_alloc_and_copy(&(req->referer), value);
     } else if (strcasecmp(name, "origin") == 0) {
-        req->origin = malloc(sizeof(char) * strlen(value) + 1);
-        strcpy(req->origin, value);
+        str_alloc_and_copy(&(req->origin), value);
     } else if (strcasecmp(name, "from") == 0) {
-        req->from = malloc(sizeof(char) * strlen(value) + 1);
-        strcpy(req->from, value);
+        str_alloc_and_copy(&(req->from), value);
     } else if (strcasecmp(name, "content-length")) {
         req->content_length = atoi(value);
     } else {

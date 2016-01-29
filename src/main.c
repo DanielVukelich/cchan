@@ -5,26 +5,21 @@
 
 #include <util/files.h>
 #include <net/http.h>
+#include <net/server.h>
+#include <net/handlers.h>
 
 int main(int argc, char **argv)
 {
-    int filed = open("testfiles/test_request", O_RDONLY);
-    HTTPRequest* request = parse_HTTPRequest(filed);
-    if (request == NULL) {
-        exit(EXIT_FAILURE);
+    int port = 80;
+    HTTPServer server;
+    if (argc > 1) {
+        port = atoi(argv[1]);
     }
-    (void) argc;
-    (void) argv;
-    puts("\nmethod:");
-    printf("%d\n", request->method);
-    puts("\ntarget:");
-    puts(request->target);
-    puts("\nprotocol:");
-    puts(request->protocol.name);
-    puts("\nprotocol version:");
-    puts(request->protocol.version);
-    free_HTTPRequest(request);
-    close(filed);
+    init_handlers();
+    init_HTTPServer(&server, port, 0);
+    run_HTTPServer(&server);
+    close_HTTPServer(&server);
+    fin_handlers();
     return EXIT_SUCCESS;
 }
 

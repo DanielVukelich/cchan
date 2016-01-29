@@ -1,7 +1,5 @@
 #pragma once
 
-#define HTTP_BUFFER_SIZE 2048
-
 #include "headers.h"
 
 #include <stdlib.h>
@@ -29,11 +27,6 @@ typedef struct {
     /* request body */
     char* body;
 } HTTPRequest;
-
-typedef struct {
-    int socket_fd;
-    char buffer[HTTP_BUFFER_SIZE];
-} HTTPServerSocket;
 
 /* 
  * Create an empty HTTP request with empty fields
