@@ -58,6 +58,8 @@ void run_HTTPServer(HTTPServer *server)
         requests[0] = parse_HTTPRequest(client_sockets[0]);
         if (requests[0] == NULL) {
             puts("Error with request");
+            send_static(client_sockets[0], "/static/errors/400.html");
+            continue;
         }
         puts ("Got request");
         /* get first URI string */
@@ -77,7 +79,7 @@ void run_HTTPServer(HTTPServer *server)
             /* send 404 */
             send_http_startline(client_sockets[0], 404);
             send_http_finheaders(client_sockets[0]);
-            send_static(client_sockets[0], "static/errors/404.html");
+            send_static(client_sockets[0], "/static/errors/404.html");
         } else {
             resp = handler(requests[0], client_sockets[0]);
         }
