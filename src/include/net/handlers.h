@@ -9,6 +9,7 @@ of text between the two first slashes */
 typedef int (*HandlerFunc) (HTTPRequest *request, int client_sock);
 
 int indexHandler(HTTPRequest *request, int client_sock);
+int staticHandler(HTTPRequest *request, int client_sock);
 
 typedef struct {
     HandlerFunc handler;

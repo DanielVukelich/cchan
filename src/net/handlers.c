@@ -1,8 +1,10 @@
 #include <net/handlers.h>
+#include <net/static.h>
 #include <util/strings.h>
 
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 
 RequestHandler requestHandlersTable[];
 int n_handlers;
@@ -10,9 +12,11 @@ int n_handlers;
 void init_handlers()
 {
     /* TODO: function to add handler to table */
-    n_handlers = 1;
+    n_handlers = 2;
     requestHandlersTable[0].handler = indexHandler;
+    requestHandlersTable[1].handler = staticHandler;
     str_alloc_and_copy(&(requestHandlersTable[0].name), "");
+    str_alloc_and_copy(&(requestHandlersTable[1].name), "static");
 }
 
 void fin_handlers()
@@ -46,18 +50,31 @@ int indexHandler(HTTPRequest *request, int client_sock)
     return 200;
 }
 
+int staticHandler(HTTPRequest *request, int client_sock)
+{
+    int ret; /* return code */
+
+    /* TODO: check for errors before sending startline */
+    send_http_startline(client_sock, 200);
+    send_http_finheaders(client_sock);
+    ret = send_static(client_sock, request->target);
+    send_http_endmsg(client_sock);
+    return ret;
+}
+
 void send_http_startline(int filed, int code)
 {
     /* TODO: this is just here for testing */
-    static char startline[] = "HTTP/1.1 200 OK\r\n";
-    (void) code;
+    char *startline;
+    startline = malloc(sizeof("HTTP/1.1 XXX ") + 16);
+    sprintf(startline, "HTTP/1.1 %3d %s", code, "OK");
     write(filed, startline, strlen(startline));
 }
 
 void send_http_finheaders(int filed)
 {
-    static char crlf[] = "\r\n";
-    write(filed, crlf, 2);
+    static char crlf[] = "\r\n\r\n";
+    write(filed, crlf, 4);
 }
 
 void send_http_endmsg(int filed)

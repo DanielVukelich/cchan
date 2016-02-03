@@ -1,6 +1,8 @@
 #include <net/server.h>
 #include <net/http.h>
 #include <net/handlers.h>
+#include <net/static.h>
+#include <util/strings.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -42,7 +44,7 @@ void run_HTTPServer(HTTPServer *server)
     struct sockaddr_in clients_info[N_THREADS];
     int client_sockets[N_THREADS];
     HandlerFunc handler;
-    char *aux;
+    char *aux, *aux_init;
     int resp;
     socklen_t socket_len = sizeof(struct sockaddr_in);
     HTTPRequest *requests[N_THREADS] = {NULL};
@@ -56,24 +58,35 @@ void run_HTTPServer(HTTPServer *server)
         requests[0] = parse_HTTPRequest(client_sockets[0]);
         if (requests[0] == NULL) {
             puts("Error with request");
+            send_static(client_sockets[0], "/static/errors/400.html");
+            continue;
         }
         puts ("Got request");
         /* get first URI string */
-        aux = strtok(requests[0]->target, "/");
+        /* create a copy of target because strtok is shit tbqh */
+        str_alloc_and_copy(&aux, requests[0]->target);
+        aux_init = aux;
+        aux = strtok(aux, "/");
         puts(requests[0]->target);
         if (aux == NULL) { /* received "/" */
             handler = get_HandlerFunc("");
         } else {
-            puts("Other than \"\"");
+            puts("handler string:");
+            puts(aux);
             handler = get_HandlerFunc(aux);
         }
         if (handler == NULL) {
-            puts("NULL handler");
+            /* send 404 */
+            send_http_startline(client_sockets[0], 404);
+            send_http_finheaders(client_sockets[0]);
+            send_static(client_sockets[0], "/static/errors/404.html");
+        } else {
+            resp = handler(requests[0], client_sockets[0]);
         }
-        resp = handler(requests[0], client_sockets[0]);
-        printf("Returned %d\n", resp);
         close(client_sockets[0]);
+        printf("Returned %d\n", resp);
         /* done */
+        free(aux_init);
         free_HTTPRequest(requests[0]);
     } while (client_sockets[0]);
 }
