@@ -19,37 +19,6 @@
 #define MAX_HEADER_FN_LEN 256
 #define MAX_BODY_LEN 65536
 
-/* automaton states */
-/* GENERAL STATES */
-#define AUTOST_START_LINE 0 /* <------------- START */
-#define AUTOST_ERR_BADREQ 1 /* bad request, found error in formatting */
-#define AUTOST_ERR_OTHER  2 /* could be anything */
-#define AUTOST_CR_STARTL  3 /* first carry return after start line */
-#define AUTOST_LF_STARTL  4 /* first line feed after start line */
-#define AUTOST_HEADER     5
-#define AUTOST_HEADER_CR  6 /* carry return and line feeds after headers */
-#define AUTOST_HEADER_LF  7
-#define AUTOST_HEADER_CR2 8 /* carry return and line feed before body */
-#define AUTOST_HEADER_LF2 9
-#define AUTOST_BODY      10 /* --------------> END*/
-
-/* STATES IN START LINE */
-#define AUTOST_SL_METHOD  1 /* method of request , START HERE*/
-#define AUTOST_SL_SP1     2 /* whitespace between method and target */
-#define AUTOST_SL_TARGET  3 /* target */
-#define AUTOST_SL_TARGETS 5 /* target's first slash */
-#define AUTOST_SL_SP2     6 /* whitespace between target and protocol */
-#define AUTOST_SL_PROTOCN 7 /* protocol name */
-#define AUTOST_SL_PROTOCS 8 /* slash between protocol name and protocol version */
-#define AUTOST_SL_PROTOCV 9 /* protocol version, FINISH HERE */
-
-/* STATES IN HEADER */
-#define AUTOST_HE_FN     1 /* field name, START HERE */
-#define AUTOST_HE_COLON  2 /* colon between field name and value */
-#define AUTOST_HE_OWS1   3 /* optional whitespaces before field value */
-#define AUTOST_HE_FV     4 /* header field value */
-#define AUTOST_HE_FVSP   5 /* single space between field values, FINISH HERE if CRLF */
-
 /* error macros */
 #define parseerror(x) puts("Parsing error: "x)
 #define methoderror(x,y) puts(x" method: "); puts(y); free(request); return NULL
@@ -57,33 +26,8 @@
 HTTPRequest *new_HTTPRequest()
 {
     HTTPRequest *req = malloc(sizeof(HTTPRequest));
+    memset(req, 0, sizeof(HTTPRequest));
     req->method = INVALID_METHOD;
-    req->protocol.name = NULL;
-    req->protocol.version = NULL;
-    req->target = NULL;
-    req->host.port = 0;
-    req->host.name = NULL;
-    req->accept_language.primary_tag = NULL;
-    req->accept_language.subtags = NULL;
-    req->accept_language.n_subtags = 0;
-    req->accept_date.day = 0;
-    req->accept_date.month = 0;
-    req->accept_date.year = 0;
-    req->accept_date.hour = 0;
-    req->accept_date.minute = 0;
-    req->accept_date.second = 0;
-    req->connection = CONN_DEFAULT;
-    req->user_agent.products = NULL;
-    req->user_agent.nproducts = 0;
-    req->user_agent.comments = NULL;
-    req->user_agent.ncomments = 0;
-    req->upgrade.name = NULL;
-    req->upgrade.version = NULL;
-    req->referer = NULL;
-    req->origin = NULL;
-    req->from = NULL;
-    req->content_length = 0;
-    req->body = NULL;
     return req;
 }
 
