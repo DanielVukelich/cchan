@@ -21,7 +21,7 @@
 
 /* error macros */
 #define parseerror(x) puts("Parsing error: "x)
-#define methoderror(x,y) puts(x" method: "); puts(y); free(request); return NULL
+#define methoderror(x,y) puts(x" method: "); puts(y); free_HTTPRequest(request); return NULL
 
 HTTPRequest *new_HTTPRequest()
 {
@@ -91,8 +91,8 @@ void free_HTTPRequest(HTTPRequest *req)
 
 HTTPRequest *parse_HTTPRequest(int filed)
 {
-    HTTPRequest* request = malloc(sizeof(HTTPRequest));
-    char buffer[BLOCK_SIZE];
+    HTTPRequest* request = new_HTTPRequest();
+    char buffer[BLOCK_SIZE], thischar, nextchar;
     char method[MAX_METHOD_LEN];
     char body[MAX_BODY_LEN];
     char protocol[MAX_PROTOCOL_LEN];
