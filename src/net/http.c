@@ -92,7 +92,7 @@ void free_HTTPRequest(HTTPRequest *req)
 HTTPRequest *parse_HTTPRequest(int filed)
 {
     HTTPRequest* request = malloc(sizeof(HTTPRequest));
-    char buffer[BLOCK_SIZE], thischar, nextchar;
+    char buffer[BLOCK_SIZE];
     char method[MAX_METHOD_LEN];
     char body[MAX_BODY_LEN];
     char protocol[MAX_PROTOCOL_LEN];
@@ -102,342 +102,19 @@ HTTPRequest *parse_HTTPRequest(int filed)
     int n_chars_read = 0, /* because this is how you handle POSIX files */
         done = 0, /* set to 1 when EOF is reached */
         i = 0, /* counter when reading large blocks of read data */
-        j = 0, /* counter when writing in a given buffer */
         nline = 1, /* for debugging info */
-        ncol = 1, /* same */
-        bodylen = 0; /* length of body */
-    int first_level_state = AUTOST_START_LINE,
-        second_level_state = AUTOST_SL_METHOD;
-    int aux_ret = 0; /* used to retrieve the value of some function for
-    checking purposes */
+
+    /* ----- PARSING ----- */
     do {
         n_chars_read = read(filed, buffer, BLOCK_SIZE);
         if (n_chars_read < BLOCK_SIZE) { /* reading last block of file */
             done = 1;
         }
         for (i = 0; i < n_chars_read - 1; ++i) {
-            thischar = buffer[i];
-            nextchar = buffer[i + 1];
-            switch (first_level_state) {
-                case AUTOST_START_LINE: /* sub automaton */
-                    switch (second_level_state) {
-                        case AUTOST_SL_METHOD:
-                            method[j++] = thischar;
-                            if (is_http_tchar(nextchar)) {
-                                /* make sure the method length isn't too long */
-                                if (j >= MAX_METHOD_LEN - 2) {
-                                    puts("Parsing method.");
-                                    parseerror("Excessive method length.");
-                                    first_level_state = AUTOST_ERR_BADREQ;
-                                }
-                            } else if (nextchar == ' ') {
-                                method[j] = '\0'; /* finish writing method */
-                                j = 0;
-                                second_level_state = AUTOST_SL_SP1;
-                            } else {
-                                puts("Parsing method.");
-                                parseerror("expected token character or SP.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_SL_SP1:
-                            if (nextchar == '/') { /* target must start with / */
-                                second_level_state = AUTOST_SL_TARGETS;
-                            } else {
-                                puts("Parsing startline first space.");
-                                parseerror("expected slash.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break; 
-
-                        case AUTOST_SL_TARGETS: /* target's first slash */
-                            target[j++] = thischar;
-                            if (nextchar == ' ') {
-                                target[j] = '\0';
-                                j = 0;
-                                second_level_state = AUTOST_SL_SP2;
-                            } else if ( is_http_tchar(nextchar) ) {
-                                second_level_state = AUTOST_SL_TARGET;
-                            } else {
-                                puts("Parsing target's first slash.");
-                                parseerror("expected either token character or SP.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_SL_TARGET:
-                            target[j++] = thischar;
-                            if (isgraph(nextchar)) {
-                                if (j >= MAX_TARGET_LEN - 2) {
-                                    puts("Parsing target.");
-                                    parseerror("Excessive target length");
-                                    first_level_state = AUTOST_ERR_BADREQ;
-                                }
-                            } else if (nextchar == ' ') {
-                                target[j] = '\0';
-                                j = 0;
-                                second_level_state = AUTOST_SL_SP2;
-                            } else {
-                                puts("Parsing target past the first slash.");
-                                parseerror("expected VCHAR or SP.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_SL_SP2:
-                            if (is_http_tchar(nextchar)) {
-                                second_level_state = AUTOST_SL_PROTOCN;
-                            } else {
-                                puts("Parsing startline's second space.");
-                                parseerror("expected token character.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_SL_PROTOCN:
-                            protocol[j++] = thischar;
-                            if (is_http_tchar(nextchar)) {
-                                ;
-                            } else if (nextchar == '/') {
-                                second_level_state = AUTOST_SL_PROTOCS;
-                            } else {
-                                puts("Parsing protocol name.");
-                                parseerror("expected slash or token character.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_SL_PROTOCS:
-                            protocol[j++] = thischar;
-                            if(is_http_tchar(nextchar)) {
-                                second_level_state = AUTOST_SL_PROTOCV;
-                            } else {
-                                puts("Parsing protocol separating slash.");
-                                parseerror("expected token character.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_SL_PROTOCV:
-                            protocol[j++] = thischar;
-                            if (is_http_tchar(nextchar)) {
-                                ;
-                            } else if (nextchar == '\r'){
-                                protocol[j] = '\0';
-                                j = 0;
-                                first_level_state = AUTOST_CR_STARTL;
-                            } else {
-                                puts("Parsing protocol version.");
-                                parseerror("expected token character or CR");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        default: /* should not happen */
-                            break;
-                    };
-                    break;
-
-                case AUTOST_ERR_BADREQ:
-                    printf("Line %d, column %d\n", nline, ncol);
-                    point_error_in_line(buffer, i);
-                    if (isgraph(thischar) ) {
-                        printf("Current character: '%c', ", thischar);
-                    } else {
-                        printf("Current character: 0x%02x, ", thischar);
-                    }
-                    if (isgraph(nextchar) ){
-                        printf("next character: '%c'\n", nextchar);
-                    } else {
-                        printf("next character: 0x%02x\n", nextchar);
-                    }
-                    free_HTTPRequest(request);
-                    return NULL;
-
-                case AUTOST_ERR_OTHER:
-                    free_HTTPRequest(request);
-                    return NULL;
-
-                case AUTOST_CR_STARTL: /* expect a linefeed */
-                    if (nextchar == '\n') {
-                        first_level_state = AUTOST_LF_STARTL;
-                    } else {
-                        puts("Parsing post-startline CR");
-                        parseerror("expected LF.");
-                        first_level_state = AUTOST_ERR_BADREQ;
-                    }
-                    break;
-
-                case AUTOST_LF_STARTL: /* expect either a header or a carry return */
-                    if (is_http_tchar(nextchar) ) { /* token character, header */
-                        first_level_state = AUTOST_HEADER;
-                        second_level_state = AUTOST_HE_FN;
-                        /* save last header, write this one*/
-                        /* check if generic header */
-                        /* if not, write into custom headers */
-                    } else if (nextchar == '\r') {  /* no headers, second empty line */
-                        first_level_state = AUTOST_HEADER_CR2;
-                    } else {
-                        puts("Parsing post-startline LF");
-                        parseerror("expected token character or CR");
-                        first_level_state = AUTOST_ERR_BADREQ;
-                    }
-                    break;
-
-                case AUTOST_HEADER: /* sub automaton */
-                    switch (second_level_state) {
-                        case AUTOST_HE_FN:
-                            header_fieldname[j++] = thischar;
-                            if (j >= MAX_HEADER_FN_LEN - 2) {
-                                puts("Parsing header's file name.");
-                                parseerror("Excessive header field name length.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            if (nextchar == ':') {
-                                header_fieldname[j] = '\0';
-                                j = 0;
-                                second_level_state = AUTOST_HE_COLON;
-                            } else if (is_http_tchar(nextchar)) {
-                                ;
-                            } else {
-                                puts("Parsing header's field name");
-                                parseerror("expected token character or ':'.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_HE_COLON:
-                            if (is_http_ws(nextchar)) {
-                                second_level_state = AUTOST_HE_OWS1;
-                            } else if (is_http_tchar(nextchar)) {
-                                second_level_state = AUTOST_HE_FV;
-                            } else {
-                                puts("Parsing header colon.");
-                                parseerror("expected token character or OWS.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_HE_OWS1:
-                            if (isgraph(nextchar)) {
-                                second_level_state = AUTOST_HE_FV;
-                            } else if (is_http_ws(nextchar)) {
-                                ; /* do nothing */
-                            } else {
-                                puts("Parsing header's post-colon OWS");
-                                parseerror("expected VCHAR or OWS.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_HE_FV:
-                            header_fieldvalue[j++] = thischar;
-                            if (j >= MAX_HEADER_FV_LEN -2 ) {
-                                puts("Parsing header's field value.");
-                                parseerror("Excessive field value length.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            if (isgraph(nextchar)) {
-                                ;
-                            } else if (is_http_ws(nextchar)) {
-                                header_fieldvalue[j] = '\0';
-                                j = 0;
-                                second_level_state = AUTOST_HE_FVSP;
-                            } else if (nextchar == '\r') {
-                                header_fieldvalue[j] = '\0';
-                                j = 0;
-                                first_level_state = AUTOST_HEADER_CR;
-                            } else {
-                                puts("Parsing header's field value");
-                                parseerror("expected VCHAR or SP/HTAB.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        case AUTOST_HE_FVSP:
-                            if (isgraph(nextchar)) {
-                                second_level_state = AUTOST_HE_FV;
-                            } else if (is_http_ws(nextchar)){
-                                ; /* do nothing */
-                            } else if (nextchar == '\r') {
-                                first_level_state = AUTOST_HEADER_CR;
-                            } else {
-                                puts("Parsing header's field value space");
-                                parseerror("expected VCHAR, CR or SP/HTAB.");
-                                first_level_state = AUTOST_ERR_BADREQ;
-                            }
-                            break;
-
-                        default: /* should not happen */
-                            break;
-                    };
-                    break;
-
-                case AUTOST_HEADER_CR: /* expect a linefeed */
-                    if (nextchar == '\n' ) {
-                        first_level_state = AUTOST_HEADER_LF;
-                    } else {
-                        puts("Parsing header's first CR");
-                        parseerror("expected LF.");
-                        first_level_state = AUTOST_ERR_BADREQ;
-                    }
-                    break;
-
-                case AUTOST_HEADER_LF: /* expect either a header or a carry return */
-                    if (is_http_tchar(nextchar) ) { /* token, therefore field name */
-                        first_level_state = AUTOST_HEADER;
-                        second_level_state = AUTOST_HE_FN;
-                        aux_ret = parse_header(request, header_fieldname, header_fieldvalue);
-                        if (! aux_ret) {
-                            ;/* TODO: save header, realloc, etc. */
-                        } else {
-                            ; /* nothing tbh fam */
-                        }
-                    } else if (nextchar == '\r') { /* second empty line */
-                        first_level_state = AUTOST_HEADER_CR2;
-                    } else {
-                        puts("Parsing header's first LF.");
-                        parseerror("expected token character or CR.");
-                        first_level_state = AUTOST_ERR_BADREQ;
-                    }
-                    break;
-
-                case AUTOST_HEADER_CR2: /* expect a line feed */
-                    if (nextchar == '\n') {
-                        first_level_state = AUTOST_HEADER_LF2;
-                    } else {
-                        puts("Parsing header's second CR");
-                        parseerror("expected LF.");
-                        first_level_state = AUTOST_ERR_BADREQ;
-                    }
-                    break;
-
-                case AUTOST_HEADER_LF2: /* expect anything */
-                    first_level_state = AUTOST_BODY;
-                    break;
-
-                case AUTOST_BODY: /* just accept tbqh fam */
-                    /* TODO: dis gun need sum serious work bc it's underoptimized af*/
-                    body[j++] = thischar;
-                    if (j >= MAX_BODY_LEN - 2) {
-                        puts("Excessive body length.");
-                        first_level_state = AUTOST_ERR_BADREQ;
-                    }
-                    ++ bodylen;
-                    break;
-
-                default: /* should not happen, but the compiler will whine at me */
-                    break;
-            }; /* switch(first_state_level) */
-            /* update debug info */
-            ++ncol;
-            if (thischar == '\n') {
-                ncol = 1;
-                ++ nline;
-            }
         } /* reading block "for" loop */
     } while (! done);
+    /* ----- END PARSING ----- */
+
     /* parse last header */
     if (! parse_header(request, header_fieldname, header_fieldvalue)) {
         /* TODO: save header */
@@ -486,5 +163,36 @@ int parse_header(HTTPRequest *req, char name[], char value[])
         return 1;
     }
     return 0;
+}
+
+int parse_HTTPRequest_startline(HTTPRequest *req, int filed, char *buffer[])
+{
+    int done = 0, parsed_method = 0, parsed_target = 0, parsed_protocol = 0,
+        i = 0, cursor = 0, read_chars, ret_val;
+    char method_str = malloc(MAX_METHOD_LEN), c;
+
+    /* alloc buffer */
+    *buffer = malloc(BLOCK_SIZE);
+    if (*buffer == NULL) {
+        return -1;
+    }
+
+    while (! done) {
+
+        /* from file to buffer */
+        read_chars = read(files, *buffer, BLOCK_SIZE);
+        if (read_chars < 0) {
+            puts(__FILE__);
+            puts("Got negative read_chars value.");
+            exit(EXIT_FAILURE);
+        } else if (read_chars < BLOCK_SIZE) {
+            done = 1;
+            buffer[read_chars] = '\0';
+        }
+
+    }
+
+    free (method_str);
+    return cursor;
 }
 
