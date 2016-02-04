@@ -5,7 +5,12 @@
 
 int str_alloc_and_copy(char **dst, char *src)
 {
-    *dst = malloc(sizeof(char) * strlen(src));
+    size_t len = strlen(src);
+    if (len == 0) {
+        *dst = NULL;
+        return 0;
+    }
+    *dst = malloc(len + 1);
     if (dst == NULL) {
         return -1;
     }
