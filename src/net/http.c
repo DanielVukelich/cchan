@@ -2,6 +2,7 @@
 #include <net/headers.h>
 #include <util/http.h>
 #include <util/strings.h>
+#include <util/files.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -89,54 +90,32 @@ void free_HTTPRequest(HTTPRequest *req)
     free(req);
 }
 
-HTTPRequest *parse_HTTPRequest(int filed)
+HTTPRequest *parse_HTTPRequest(HTTPRequest *request)
 {
-    HTTPRequest* request = new_HTTPRequest();
-    char buffer[BLOCK_SIZE], thischar, nextchar;
-    char method[MAX_METHOD_LEN];
-    char body[MAX_BODY_LEN];
-    char protocol[MAX_PROTOCOL_LEN];
-    char target[MAX_TARGET_LEN];
-    char header_fieldname[MAX_HEADER_FN_LEN];
-    char header_fieldvalue[MAX_HEADER_FV_LEN];
-    int n_chars_read = 0, /* because this is how you handle POSIX files */
-        done = 0, /* set to 1 when EOF is reached */
-        i = 0, /* counter when reading large blocks of read data */
-        nline = 1, /* for debugging info */
-
-    /* ----- PARSING ----- */
-    do {
-        n_chars_read = read(filed, buffer, BLOCK_SIZE);
-        if (n_chars_read < BLOCK_SIZE) { /* reading last block of file */
-            done = 1;
-        }
-        for (i = 0; i < n_chars_read - 1; ++i) {
-        } /* reading block "for" loop */
-    } while (! done);
-    /* ----- END PARSING ----- */
-
-    /* parse last header */
-    if (! parse_header(request, header_fieldname, header_fieldvalue)) {
-        /* TODO: save header */
-    } else {
-        ; /* nothing */
+    char *line, *extra;
+    /* parse startline */
+    get_nextline_blocks(request->client.socket, &line, &extra, NULL, BLOCK_SIZE);
+    puts (line);
+    parse_HTTPRequest_startline(request, line);
+    if (request->target == NULL) {
+        puts("Null target!");
     }
-    request->method = get_http_method(method);
-    if (request->method == INVALID_METHOD) {
-        methoderror("Invalid", method);
-    }
-    /* --- TODO: check if request is valid --- */
-    /* --- write collected info to request --- */
-    (void) body;
-    parse_http_ProductToken(&(request->protocol), protocol);
-    str_alloc_and_copy(&(request->target), target);
     return request;
 }
 
-
-/* return 1 if header was standard, 0 if it was custom*/
-int parse_header(HTTPRequest *req, char name[], char value[])
+/* return 1 if header was standard, 0 if it was custom, -1 if wrongly formatted */
+int parse_header(HTTPRequest *req, char line[])
 {
+    char *value, *name, *strtok_buffer = malloc(strlen(line) + 1);
+
+    name = strtok_r(line, ":", &strtok_buffer);
+    value = strtok_r(NULL, "\r", &strtok_buffer);
+    if (value == NULL) {
+        free(strtok_buffer);
+        return -1;
+    }
+    while (*value++ == ' ');
+
     /* check header name */
     /* TODO: check for headers validity */
     if (strcasecmp(name, "host") == 0){ /* host, should be first header */
@@ -157,42 +136,49 @@ int parse_header(HTTPRequest *req, char name[], char value[])
         str_alloc_and_copy(&(req->origin), value);
     } else if (strcasecmp(name, "from") == 0) {
         str_alloc_and_copy(&(req->from), value);
-    } else if (strcasecmp(name, "content-length")) {
+    } else if (strcasecmp(name, "content-length") == 0) {
         req->content_length = atoi(value);
     } else {
+        free(strtok_buffer);
         return 1;
+    }
+    free(strtok_buffer);
+    return 0;
+}
+
+int parse_HTTPRequest_startline(HTTPRequest *req, char line[])
+{
+    char *aux, *strtok_buffer;
+
+    /* get method */
+    aux = strtok_r(line, " ", &strtok_buffer);
+    req->method = get_http_method(aux);
+    /* get target */
+    aux = strtok_r(NULL, " ", &strtok_buffer);
+    ++aux; /* go past whitespace */
+    str_alloc_and_copy(&(req->target), aux);
+    /* get protocol */
+    aux = strtok_r(NULL, "", &strtok_buffer);
+    ++aux;
+    if (parse_HTTPRequest_protocol(req, aux) < 0) {
+        puts("Invalid protocol");
+        return -1;
     }
     return 0;
 }
 
-int parse_HTTPRequest_startline(HTTPRequest *req, int filed, char *buffer[])
+int parse_HTTPRequest_protocol(HTTPRequest *req, char str[])
 {
-    int done = 0, parsed_method = 0, parsed_target = 0, parsed_protocol = 0,
-        i = 0, cursor = 0, read_chars, ret_val;
-    char method_str = malloc(MAX_METHOD_LEN), c;
-
-    /* alloc buffer */
-    *buffer = malloc(BLOCK_SIZE);
-    if (*buffer == NULL) {
-        return -1;
+    char *strtok_buffer, *aux;
+    
+    /* get protocol name */
+    aux = strtok_r(str, "/", &strtok_buffer);
+    str_alloc_and_copy(&(req->protocol.name), aux);
+    aux = strtok_r(NULL, "", &strtok_buffer);
+    if (aux == NULL) {
+         return -1;
     }
-
-    while (! done) {
-
-        /* from file to buffer */
-        read_chars = read(files, *buffer, BLOCK_SIZE);
-        if (read_chars < 0) {
-            puts(__FILE__);
-            puts("Got negative read_chars value.");
-            exit(EXIT_FAILURE);
-        } else if (read_chars < BLOCK_SIZE) {
-            done = 1;
-            buffer[read_chars] = '\0';
-        }
-
-    }
-
-    free (method_str);
-    return cursor;
+    str_alloc_and_copy(&(req->protocol.version), aux);
+    return 0;
 }
 

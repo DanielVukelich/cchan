@@ -23,7 +23,7 @@ void fin_handlers()
 {
     int i;
     for (i = 0; i < n_handlers; ++i) {
-        free(requestHandlersTable[0].name);
+        free(requestHandlersTable[i].name);
     }
 }
 
