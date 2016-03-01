@@ -47,13 +47,13 @@ void get_nextline(int filed, char **nextline)
 void get_nextline_blocks(int filed, char *nextline[], char *extra[], char init[], size_t block_size)
 {
     int done = 0, read_bytes, line_size = 0, crlf_pos = 0;
-    int nextl_start, nextl_len, init_len;
+    int nextl_start = 0, nextl_len = 0, init_len = 0;
     char *buffer, *aux;
 
     *nextline = NULL;
     /* check if there is anything in init */
 
-    buffer = malloc(block_size);
+    buffer = calloc(sizeof(char), block_size);
     if (init != NULL) {
         init_len = strlen(init);
         memcpy(buffer, init, init_len);
@@ -64,6 +64,7 @@ void get_nextline_blocks(int filed, char *nextline[], char *extra[], char init[]
         init_len = 0;
         if (read_bytes < 0) {
             free(buffer);
+            puts("Error reading from file");
             if (*nextline != NULL) {
                 free(*nextline);
             }
@@ -102,7 +103,7 @@ void get_nextline_blocks(int filed, char *nextline[], char *extra[], char init[]
                 /* write last piece of line */
                 if (*nextline == NULL) {
                     *nextline = malloc(sizeof(char) * nextl_start + 1);
-                    memcpy(*nextline, buffer, read_bytes);
+                    memcpy(*nextline, buffer, read_bytes + 1);
                     line_size += 1;
                 } else {
                     *nextline = realloc(*nextline, sizeof(char) * (nextl_start + line_size));

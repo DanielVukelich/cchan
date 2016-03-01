@@ -40,14 +40,14 @@ void run_HTTPServer(HTTPServer *server)
 {
     /* WARNING: messy code */
     /* NOTE: multithreading is not implemented yet */
-    /* int i; */
     int resp;
     socklen_t socket_len = sizeof(struct sockaddr_in);
-    HTTPRequest *request = new_HTTPRequest();
+    HTTPRequest *request;
 
     listen(server->socket, 1);
 
     do {
+        request = new_HTTPRequest();
         request->client.socket = accept(server->socket,
                 (struct sockaddr *) &(request->client.info), &socket_len);
         /* handle */
@@ -60,11 +60,11 @@ void run_HTTPServer(HTTPServer *server)
         } else {
             resp = handle_HTTPRequest(server, request);
         }
-        puts ("Got request");
+        puts("Got request");
         printf("Returned %d\n", resp);
         /* done */
         free_HTTPRequest(request);
-    } while (request->client.socket > 0);
+    } while (request->client.socket >= 0);
 }
 
 int handle_HTTPRequest(HTTPServer* server, HTTPRequest *request)
