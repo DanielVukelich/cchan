@@ -3,6 +3,7 @@
 #include <net/handlers.h>
 #include <net/static.h>
 #include <util/strings.h>
+#include <util/http.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -69,34 +70,30 @@ void run_HTTPServer(HTTPServer *server)
 
 int handle_HTTP_Request(HTTPServer* server, HTTP_Request *request)
 {
-    char *aux = NULL;
     HandlerFunc handler;
-    int resp;
+    char *handler_name;
+    int response_code;
 
     (void) server;
     /* get first URI string */
-    /* create a copy of target because strtok is shit tbqh */
-    str_alloc_and_copy(&aux, request->target);
-    aux = strtok(aux, "/");
+    puts("request target:");
     puts(request->target);
-    if (aux == NULL) { /* received "/" */
-        handler = get_HandlerFunc("");
-    } else {
-        puts("handler string:");
-        puts(aux);
-        handler = get_HandlerFunc(aux);
-    }
+    handler_name = get_handler_name_from_URI(request->target);
+    puts("handler string:");
+    puts(handler_name);
+    handler = get_HandlerFunc(handler_name);
     if (handler == NULL) {
         /* send 404 */
         send_HTTP_startline(request->client.socket, 404);
         send_HTTP_finheaders(request->client.socket);
         send_static(request->client.socket, "/static/errors/404.html");
-        resp = 404;
+        response_code = 404;
     } else {
-        resp = handler(request, request->client.socket);
+        response_code = handler(request, request->client.socket);
     }
+    free(handler_name);
     close(request->client.socket);
-    return resp;
+    return response_code;
 }
 
 void close_HTTPServer(HTTPServer *server)

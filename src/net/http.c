@@ -134,7 +134,6 @@ int parse_HTTP_Request_startline(HTTP_Request *req, char line[])
     req->method = get_HTTP_Method(aux);
     /* get target */
     aux = strtok_r(NULL, " ", &strtok_buffer);
-    ++aux; /* go past whitespace */
     str_alloc_and_copy(&(req->target), aux);
     /* get protocol */
     aux = strtok_r(NULL, "", &strtok_buffer);

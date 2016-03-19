@@ -17,3 +17,8 @@ void point_error_in_line(char buffer[], int currentpos);
 
 /* get a method type from a string representation */
 HTTP_Method get_HTTP_Method(char str[]);
+
+/* get handler strign in URI, i.e. "handler" in /<handler>/some/resource.
+ *  returns a brand new string that must be freed */
+char *get_handler_name_from_URI(char uri[]);
+
