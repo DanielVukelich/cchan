@@ -34,7 +34,6 @@ HTTP_Request *new_HTTP_Request()
 
 void free_HTTP_Request(HTTP_Request *req)
 {
-    int i;
     if (req->protocol.name != NULL) {
         free(req->protocol.name);
     }
@@ -47,27 +46,8 @@ void free_HTTP_Request(HTTP_Request *req)
     if (req->host.name != NULL) {
         free(req->host.name);
     }
-    if (req->accept_language.primary_tag != NULL) {
-        free(req->accept_language.primary_tag);
-    }
-    if (req->accept_language.subtags != NULL) {
-        for (i = 0; i < req->accept_language.n_subtags; ++i) {
-            free(req->accept_language.subtags[i]);
-        }
-        free(req->accept_language.subtags);
-    }
-    if (req->user_agent.products != NULL) {
-        for (i = 0; i < req->user_agent.nproducts; ++i) {
-            free(req->user_agent.products + i);
-        }
-        free(req->user_agent.products);
-    }
-    if (req->user_agent.comments != NULL) {
-        for (i = 0; i < req->user_agent.ncomments; ++i) {
-            free(req->user_agent.comments[i]);
-        }
-        free(req->user_agent.comments);
-    }
+    free_HTTP_AcceptLanguage(&(req->accept_language));
+    free_HTTP_UserAgent(&(req->user_agent));
     if (req->upgrade.name != NULL) {
         free(req->upgrade.name);
     }
@@ -120,7 +100,7 @@ int parse_header(HTTP_Request *req, char line[])
     if (strcasecmp(name, "host") == 0){ /* host, should be first header */
         parse_HTTP_Host(&(req->host), value);
     } else if (strcasecmp(name, "accept-language") == 0) {
-        parse_HTTP_LanguageToken(&(req->accept_language), value);
+        parse_HTTP_AcceptLanguage(&(req->accept_language), value);
     } else if (strcasecmp(name, "accept-date") == 0) {
         parse_HTTP_Date(&(req->accept_date), value);
     } else if (strcasecmp(name, "connection") == 0) {

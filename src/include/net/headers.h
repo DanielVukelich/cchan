@@ -55,7 +55,7 @@ typedef struct {
 
 typedef enum {
     BASIC
-} HTTP_auth_type;
+} HTTP_AuthenticationType;
 
 typedef struct {
     char *type;
@@ -80,8 +80,23 @@ typedef struct {
     int n_subtags;
 } HTTP_LanguageToken;
 
+typedef struct {
+    HTTP_LanguageToken *languages;
+    int nlanguages;
+} HTTP_AcceptLanguage;
+
+/* free different special HTTP header types */
+void free_HTTP_UserAgent(HTTP_UserAgent *user_agent);
+void free_HTTP_AcceptLanguage(HTTP_AcceptLanguage *accept_language);
+void free_HTTP_LanguageToken(HTTP_LanguageToken *language_token);
+void free_HTTP_ProductToken(HTTP_ProductToken *product_token);
+void free_HTTP_AcceptField(HTTP_AcceptField *accept_field);
+void free_HTTP_Cookie(HTTP_Cookie *cookie);
+void free_HTTP_Host(HTTP_Host *host);
+
 /* parse different HTTP header types, return 0 on success, -1 otherwise */
 int parse_HTTP_Host(HTTP_Host *host, char value[]);
+int parse_HTTP_AcceptLanguage(HTTP_AcceptLanguage *accept_language, char value[]);
 int parse_HTTP_LanguageToken(HTTP_LanguageToken *token, char value[]);
 int parse_HTTP_Date(HTTP_Date *date, char value[]);
 int parse_HTTP_ConnectionType(HTTP_ConnectionType *connection, char value[]);

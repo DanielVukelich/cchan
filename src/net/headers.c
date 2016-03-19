@@ -51,6 +51,12 @@ int parse_HTTP_UserAgent(HTTP_UserAgent *agent, char value[])
     return 0;
 }
 
+int parse_HTTP_AcceptLanguage(HTTP_AcceptLanguage *accept_language, char value[]) {
+    /* TODO: implement */
+    (void) value; (void) accept_language;
+    return 0;
+}
+
 int parse_HTTP_ProductToken(HTTP_ProductToken *token, char value[])
 {
     char *aux;
@@ -62,4 +68,43 @@ int parse_HTTP_ProductToken(HTTP_ProductToken *token, char value[])
     }
     return 0;
 }
+
+void free_HTTP_UserAgent(HTTP_UserAgent *user_agent)
+{
+    int i;
+
+    if (user_agent->comments != NULL) {
+        for (i = 0; i < user_agent->ncomments; ++i) {
+            free(user_agent->comments[i]);
+        }
+        free(user_agent->comments);
+    }
+}
+
+void free_HTTP_AcceptLanguage(HTTP_AcceptLanguage *accept_language)
+{
+    int i;
+
+    if (accept_language->languages != NULL) {
+        for (i = 0; i < accept_language->nlanguages; ++i) {
+            free_HTTP_LanguageToken(accept_language->languages + i);
+        }
+        free(accept_language->languages);
+    }
+}
+
+void free_HTTP_LanguageToken(HTTP_LanguageToken *language_token)
+{
+    int i;
+
+    if (language_token->primary_tag != NULL) {
+        free(language_token->primary_tag);
+    }
+    if (language_token->subtags != NULL) {
+        for (i = 0; i < language_token->n_subtags; ++i) {
+            free(language_token->subtags[i]);
+        }
+    }
+}
+
 

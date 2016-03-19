@@ -21,7 +21,7 @@ typedef struct {
     /*httpheader_Accept accept;
     httpheader_Accept accept_charset;
     httpheader_Accept accept_encoding;*/
-    HTTP_LanguageToken accept_language;
+    HTTP_AcceptLanguage accept_language;
     HTTP_Date         accept_date;
     /* other */
     HTTP_ConnectionType connection;
