@@ -38,31 +38,31 @@ HandlerFunc get_HandlerFunc(char str[])
     return NULL;
 }
 
-int indexHandler(HTTPRequest *request, int client_sock)
+int indexHandler(HTTP_Request *request, int client_sock)
 {
     /* TODO: remove. this is just here for testing */
     static char resp[] = "<html><head></head><body><h1>Index </h1></body></html>";
     (void) request;
-    send_http_startline(client_sock, 200); /* startline */
-    send_http_finheaders(client_sock); /* no headers needed */
+    send_HTTP_startline(client_sock, 200); /* startline */
+    send_HTTP_finheaders(client_sock); /* no headers needed */
     write(client_sock, resp, sizeof(resp));
-    send_http_endmsg(client_sock);
+    send_HTTP_endmsg(client_sock);
     return 200;
 }
 
-int staticHandler(HTTPRequest *request, int client_sock)
+int staticHandler(HTTP_Request *request, int client_sock)
 {
     int ret; /* return code */
 
     /* TODO: check for errors before sending startline */
-    send_http_startline(client_sock, 200);
-    send_http_finheaders(client_sock);
+    send_HTTP_startline(client_sock, 200);
+    send_HTTP_finheaders(client_sock);
     ret = send_static(client_sock, request->target);
-    send_http_endmsg(client_sock);
+    send_HTTP_endmsg(client_sock);
     return ret;
 }
 
-void send_http_startline(int filed, int code)
+void send_HTTP_startline(int filed, int code)
 {
     /* TODO: this is just here for testing */
     char *startline;
@@ -71,13 +71,13 @@ void send_http_startline(int filed, int code)
     write(filed, startline, strlen(startline));
 }
 
-void send_http_finheaders(int filed)
+void send_HTTP_finheaders(int filed)
 {
     static char crlf[] = "\r\n\r\n";
     write(filed, crlf, 4);
 }
 
-void send_http_endmsg(int filed)
+void send_HTTP_endmsg(int filed)
 {
     static char crlf[] = "\r\n";
     write(filed, crlf, 2);

@@ -12,27 +12,27 @@ typedef enum {
     OPTIONS,
     CONNECT,
     PATCH
-} http_method;
+} HTTP_Method;
 
 /* define enums for different HTTP headers*/
 
 typedef enum {
     CONN_DEFAULT,
     KEEP_ALIVE
-} http_ConnectionType;
+} HTTP_ConnectionType;
 
 
 /* accept fields */
 typedef struct {
     char *name;
     float qvalue;
-} http_Accept_field;
+} HTTP_AcceptField;
 
 /* other fields */
 typedef struct {
     char* name;
     char* value;
-} http_Cookie;
+} HTTP_Cookie;
 
 /* misc structures and enumerations */
 typedef struct {
@@ -42,49 +42,49 @@ typedef struct {
     unsigned char hour;
     unsigned char minute;
     unsigned char second;
-} http_Date;
+} HTTP_Date;
 
 typedef struct {
     short port;
     char* name;
-} http_Host;
+} HTTP_Host;
 
 typedef struct {
     char *name;
-} http_Authorization;
+} HTTP_Authorization;
 
 typedef enum {
     BASIC
-} http_auth_type;
+} HTTP_auth_type;
 
 typedef struct {
     char *type;
     char *subtype;
-} http_MediaType;
+} HTTP_MediaType;
 
 typedef struct {
     char *name;
     char *version;
-} http_ProductToken;
+} HTTP_ProductToken;
 
 typedef struct {
-    http_ProductToken *products;
+    HTTP_ProductToken *products;
     int nproducts;
     char **comments;
     int ncomments;
-} http_UserAgent;
+} HTTP_UserAgent;
 
 typedef struct {
     char *primary_tag;
     char **subtags;
     int n_subtags;
-} http_LanguageToken;
+} HTTP_LanguageToken;
 
 /* parse different HTTP header types, return 0 on success, -1 otherwise */
-int parse_http_Host(http_Host *host, char value[]);
-int parse_http_LanguageToken(http_LanguageToken *token, char value[]);
-int parse_http_Date(http_Date *date, char value[]);
-int parse_http_ConnectionType(http_ConnectionType *connection, char value[]);
-int parse_http_UserAgent(http_UserAgent *agent, char value[]);
-int parse_http_ProductToken(http_ProductToken *token, char value[]);
+int parse_HTTP_Host(HTTP_Host *host, char value[]);
+int parse_HTTP_LanguageToken(HTTP_LanguageToken *token, char value[]);
+int parse_HTTP_Date(HTTP_Date *date, char value[]);
+int parse_HTTP_ConnectionType(HTTP_ConnectionType *connection, char value[]);
+int parse_HTTP_UserAgent(HTTP_UserAgent *agent, char value[]);
+int parse_HTTP_ProductToken(HTTP_ProductToken *token, char value[]);
 

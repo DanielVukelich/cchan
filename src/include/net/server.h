@@ -14,7 +14,7 @@ void init_HTTPServer(HTTPServer *server, short port, int flags);
 
 void run_HTTPServer(HTTPServer *server);
 
-int handle_HTTPRequest(HTTPServer *server, HTTPRequest *request);
+int handle_HTTP_Request(HTTPServer *server, HTTP_Request *request);
 
 void close_HTTPServer(HTTPServer *server);
 

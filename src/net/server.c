@@ -42,32 +42,32 @@ void run_HTTPServer(HTTPServer *server)
     /* NOTE: multithreading is not implemented yet */
     int resp;
     socklen_t socket_len = sizeof(struct sockaddr_in);
-    HTTPRequest *request;
+    HTTP_Request *request;
 
     listen(server->socket, 1);
 
     do {
-        request = new_HTTPRequest();
+        request = new_HTTP_Request();
         request->client.socket = accept(server->socket,
                 (struct sockaddr *) &(request->client.info), &socket_len);
         /* handle */
-        request = parse_HTTPRequest(request);
+        request = parse_HTTP_Request(request);
         if (request == NULL) {
             puts("Error with request");
             send_static(request->client.socket, "/static/errors/400.html");
             resp = 400;
             continue;
         } else {
-            resp = handle_HTTPRequest(server, request);
+            resp = handle_HTTP_Request(server, request);
         }
         puts("Got request");
         printf("Returned %d\n", resp);
         /* done */
-        free_HTTPRequest(request);
+        free_HTTP_Request(request);
     } while (request->client.socket >= 0);
 }
 
-int handle_HTTPRequest(HTTPServer* server, HTTPRequest *request)
+int handle_HTTP_Request(HTTPServer* server, HTTP_Request *request)
 {
     char *aux = NULL;
     HandlerFunc handler;
@@ -88,8 +88,8 @@ int handle_HTTPRequest(HTTPServer* server, HTTPRequest *request)
     }
     if (handler == NULL) {
         /* send 404 */
-        send_http_startline(request->client.socket, 404);
-        send_http_finheaders(request->client.socket);
+        send_HTTP_startline(request->client.socket, 404);
+        send_HTTP_finheaders(request->client.socket);
         send_static(request->client.socket, "/static/errors/404.html");
         resp = 404;
     } else {

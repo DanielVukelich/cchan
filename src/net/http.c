@@ -22,20 +22,19 @@
 
 /* error macros */
 #define parseerror(x) puts("Parsing error: "x)
-#define methoderror(x,y) puts(x" method: "); puts(y); free_HTTPRequest(request); return NULL
+#define methoderror(x,y) puts(x" method: "); puts(y); free_HTTP_Request(request); return NULL
 
-HTTPRequest *new_HTTPRequest()
+HTTP_Request *new_HTTP_Request()
 {
-    HTTPRequest *req = malloc(sizeof(HTTPRequest));
-    memset(req, 0, sizeof(HTTPRequest));
+    HTTP_Request *req = malloc(sizeof(HTTP_Request));
+    memset(req, 0, sizeof(HTTP_Request));
     req->method = INVALID_METHOD;
     return req;
 }
 
-void free_HTTPRequest(HTTPRequest *req)
+void free_HTTP_Request(HTTP_Request *req)
 {
     int i;
-    /* TODO: free everything if non-NULL */
     if (req->protocol.name != NULL) {
         free(req->protocol.name);
     }
@@ -90,13 +89,13 @@ void free_HTTPRequest(HTTPRequest *req)
     free(req);
 }
 
-HTTPRequest *parse_HTTPRequest(HTTPRequest *request)
+HTTP_Request *parse_HTTP_Request(HTTP_Request *request)
 {
     char *line, *extra;
     /* parse startline */
     get_nextline_blocks(request->client.socket, &line, &extra, NULL, BLOCK_SIZE);
     puts (line);
-    parse_HTTPRequest_startline(request, line);
+    parse_HTTP_Request_startline(request, line);
     if (request->target == NULL) {
         puts("Null target!");
     }
@@ -104,7 +103,7 @@ HTTPRequest *parse_HTTPRequest(HTTPRequest *request)
 }
 
 /* return 1 if header was standard, 0 if it was custom, -1 if wrongly formatted */
-int parse_header(HTTPRequest *req, char line[])
+int parse_header(HTTP_Request *req, char line[])
 {
     char *value, *name, *strtok_buffer = malloc(strlen(line) + 1);
 
@@ -119,17 +118,17 @@ int parse_header(HTTPRequest *req, char line[])
     /* check header name */
     /* TODO: check for headers validity */
     if (strcasecmp(name, "host") == 0){ /* host, should be first header */
-        parse_http_Host(&(req->host), value);
+        parse_HTTP_Host(&(req->host), value);
     } else if (strcasecmp(name, "accept-language") == 0) {
-        parse_http_LanguageToken(&(req->accept_language), value);
+        parse_HTTP_LanguageToken(&(req->accept_language), value);
     } else if (strcasecmp(name, "accept-date") == 0) {
-        parse_http_Date(&(req->accept_date), value);
+        parse_HTTP_Date(&(req->accept_date), value);
     } else if (strcasecmp(name, "connection") == 0) {
-        parse_http_ConnectionType(&(req->connection), value);
+        parse_HTTP_ConnectionType(&(req->connection), value);
     } else if (strcasecmp(name, "user-agent") == 0) {
-        parse_http_UserAgent(&(req->user_agent), value);
+        parse_HTTP_UserAgent(&(req->user_agent), value);
     } else if (strcasecmp(name, "upgrade") == 0) {
-        parse_http_ProductToken(&(req->upgrade), value);
+        parse_HTTP_ProductToken(&(req->upgrade), value);
     } else if (strcasecmp(name, "referer") == 0) {
         str_alloc_and_copy(&(req->referer), value);
     } else if (strcasecmp(name, "origin") == 0) {
@@ -146,13 +145,13 @@ int parse_header(HTTPRequest *req, char line[])
     return 0;
 }
 
-int parse_HTTPRequest_startline(HTTPRequest *req, char line[])
+int parse_HTTP_Request_startline(HTTP_Request *req, char line[])
 {
     char *aux, *strtok_buffer;
 
     /* get method */
     aux = strtok_r(line, " ", &strtok_buffer);
-    req->method = get_http_method(aux);
+    req->method = get_HTTP_Method(aux);
     /* get target */
     aux = strtok_r(NULL, " ", &strtok_buffer);
     ++aux; /* go past whitespace */
@@ -160,14 +159,14 @@ int parse_HTTPRequest_startline(HTTPRequest *req, char line[])
     /* get protocol */
     aux = strtok_r(NULL, "", &strtok_buffer);
     ++aux;
-    if (parse_HTTPRequest_protocol(req, aux) < 0) {
+    if (parse_HTTP_Request_protocol(req, aux) < 0) {
         puts("Invalid protocol");
         return -1;
     }
     return 0;
 }
 
-int parse_HTTPRequest_protocol(HTTPRequest *req, char str[])
+int parse_HTTP_Request_protocol(HTTP_Request *req, char str[])
 {
     char *strtok_buffer, *aux;
     

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-int parse_http_Host(http_Host *host, char value[])
+int parse_HTTP_Host(HTTP_Host *host, char value[])
 {
     char *aux;
     aux = strtok(value, ":");
@@ -23,35 +23,35 @@ int parse_http_Host(http_Host *host, char value[])
     return 0;
 }
 
-int parse_http_LanguageToken(http_LanguageToken *host, char value[])
+int parse_HTTP_LanguageToken(HTTP_LanguageToken *host, char value[])
 {
     /* TODO: implement */
     (void) value; (void) host;
     return 0;
 }
 
-int parse_http_Date(http_Date *date, char value[])
+int parse_HTTP_Date(HTTP_Date *date, char value[])
 {
     /* TODO: implement */
     (void) value; (void) date;
     return 0;
 }
 
-int parse_http_ConnectionType(http_ConnectionType *connection, char value[])
+int parse_HTTP_ConnectionType(HTTP_ConnectionType *connection, char value[])
 {
     /* TODO: implement */
     (void) value; (void) connection;
     return 0;
 }
 
-int parse_http_UserAgent(http_UserAgent *agent, char value[])
+int parse_HTTP_UserAgent(HTTP_UserAgent *agent, char value[])
 {
     /* TODO: implement */
     (void) value; (void) agent;
     return 0;
 }
 
-int parse_http_ProductToken(http_ProductToken *token, char value[])
+int parse_HTTP_ProductToken(HTTP_ProductToken *token, char value[])
 {
     char *aux;
     aux = strtok(value, "/");
