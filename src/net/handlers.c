@@ -149,7 +149,7 @@ void serve_HTTP_Response(HTTP_Response *response)
     }
     /* serve content */
     if (response->serving_type == SERVE_STATIC) {
-        send_static(response->client.socket, "static/index.html");
+        send_static(response->client.socket, response->file_location);
     } else {
         return;
     }
