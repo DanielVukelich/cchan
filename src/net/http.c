@@ -32,6 +32,18 @@ HTTP_Request *new_HTTP_Request()
     return req;
 }
 
+HTTP_Response *new_HTTP_Response()
+{
+    HTTP_Response *response = malloc(sizeof(HTTP_Response));
+    memset(response, 0, sizeof(HTTP_Response));
+    return response;
+}
+
+void free_HTTP_Response(HTTP_Response *response)
+{
+    free(response);
+}
+
 void free_HTTP_Request(HTTP_Request *req)
 {
     if (req->protocol.name != NULL) {
@@ -159,4 +171,5 @@ int parse_HTTP_Request_protocol(HTTP_Request *req, char str[])
     str_alloc_and_copy(&(req->protocol.version), aux);
     return 0;
 }
+
 

@@ -8,13 +8,11 @@ typedef struct {
     int socket;
     int flags;
     short port;
-} HTTPServer;
+} HTTP_Server;
 
-void init_HTTPServer(HTTPServer *server, short port, int flags);
+void init_HTTP_Server(HTTP_Server *server, short port, int flags);
 
-void run_HTTPServer(HTTPServer *server);
+void run_HTTP_Server(HTTP_Server *server);
 
-int handle_HTTP_Request(HTTPServer *server, HTTP_Request *request);
-
-void close_HTTPServer(HTTPServer *server);
+void close_HTTP_Server(HTTP_Server *server);
 

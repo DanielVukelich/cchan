@@ -6,20 +6,18 @@ of text between the two first slashes */
 
 #include "http.h"
 
-typedef int (*HandlerFunc) (HTTP_Request *request, int client_sock);
+typedef void (*HTTP_HandlerFunction) (HTTP_Request *request, HTTP_Response* response);
 
-int indexHandler(HTTP_Request *request, int client_sock);
-int staticHandler(HTTP_Request *request, int client_sock);
+void indexHandler(HTTP_Request *request, HTTP_Response *response);
+void staticHandler(HTTP_Request *request, HTTP_Response *response);
 
 typedef struct {
-    HandlerFunc handler;
+    HTTP_HandlerFunction function;
     char *name;
-} RequestHandler;
+} HTTP_RequestHandler;
 
-extern RequestHandler requestHandlersTable[MAX_HANDLERS];
+extern HTTP_RequestHandler requestHandlersTable[MAX_HANDLERS];
 extern int n_handlers;
-
-HandlerFunc get_HandlerFunc(char str[]);
 
 void init_handlers();
 void fin_handlers();
@@ -27,4 +25,10 @@ void fin_handlers();
 void send_HTTP_startline(int filed, int code);
 void send_HTTP_finheaders(int filed);
 void send_HTTP_endmsg(int filed);
+
+char* parse_HTTP_Handler_from_URI(char uri[]);
+HTTP_HandlerFunction get_HTTP_Handler_from_name(char name[]);
+HTTP_HandlerFunction get_HTTP_Handler_from_HTTP_Request(HTTP_Request *request);
+
+void serve_HTTP_Response(HTTP_Response *response);
 
