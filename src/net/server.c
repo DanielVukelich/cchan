@@ -58,7 +58,11 @@ void run_HTTP_Server(HTTP_Server *server)
         response = new_HTTP_Response();
         response->client = request->client;
         http_handler = get_HTTP_Handler_from_HTTP_Request(request);
-        http_handler(request, response);
+        if (http_handler == NULL) {
+            response->status_code = 404;
+        } else {
+            http_handler(request, response);
+        }
         /* serve response */
         serve_HTTP_Response(response);
         /* done */

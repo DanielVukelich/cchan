@@ -38,7 +38,9 @@ void indexHandler(HTTP_Request *request, HTTP_Response *response)
 
 void staticHandler(HTTP_Request *request, HTTP_Response *response)
 {
-    (void) request; (void) response;
+    /* "+ 1" is to remove the initial slash*/
+    str_alloc_and_copy(&(response->file_location), request->target + 1);
+    response->status_code = check_file_availability(response->file_location);
 }
 
 void send_HTTP_startline(int filed, int code)
@@ -147,12 +149,15 @@ void serve_HTTP_Response(HTTP_Response *response)
         send_static(response->client.socket, "static/errors/404.html");
         goto end_response;
     }
+
     /* serve content */
     if (response->serving_type == SERVE_STATIC) {
         send_static(response->client.socket, response->file_location);
     } else {
+        /* TODO: implement templates */
         return;
     }
+
 end_response:
     send_HTTP_endmsg(response->client.socket);
 }
