@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int str_alloc_and_copy(char **dst, char *src)
+int str_alloc_and_copy(char **dst, const char *src)
 {
     size_t len;
 

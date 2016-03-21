@@ -10,6 +10,8 @@ typedef void (*HTTP_HandlerFunction) (HTTP_Request *request, HTTP_Response* resp
 
 void indexHandler(HTTP_Request *request, HTTP_Response *response);
 void staticHandler(HTTP_Request *request, HTTP_Response *response);
+void faviconHandler(HTTP_Request *request, HTTP_Response *response);
+void templateHandler(HTTP_Request *request, HTTP_Response *response);
 
 typedef struct {
     HTTP_HandlerFunction function;
@@ -19,6 +21,7 @@ typedef struct {
 extern HTTP_RequestHandler requestHandlersTable[MAX_HANDLERS];
 extern int n_handlers;
 
+void add_handler(HTTP_HandlerFunction function, const char name[]);
 void init_handlers();
 void fin_handlers();
 

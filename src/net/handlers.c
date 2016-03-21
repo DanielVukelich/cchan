@@ -9,14 +9,20 @@
 HTTP_RequestHandler requestHandlersTable[];
 int n_handlers;
 
+void add_handler(HTTP_HandlerFunction function, const char name[])
+{
+    requestHandlersTable[n_handlers].function = function;
+    str_alloc_and_copy(&(requestHandlersTable[n_handlers].name), name);
+    n_handlers ++;
+}
+
 void init_handlers()
 {
-    /* TODO: function to add handler to table */
-    n_handlers = 2;
-    requestHandlersTable[0].function = indexHandler;
-    requestHandlersTable[1].function = staticHandler;
-    str_alloc_and_copy(&(requestHandlersTable[0].name), "");
-    str_alloc_and_copy(&(requestHandlersTable[1].name), "static");
+    n_handlers = 0;
+    add_handler(indexHandler, "");
+    add_handler(staticHandler, "static");
+    add_handler(faviconHandler, "favicon.ico");
+    add_handler(templateHandler, "templates");
 }
 
 void fin_handlers()
@@ -33,6 +39,7 @@ void indexHandler(HTTP_Request *request, HTTP_Response *response)
     static char index_location[] = "static/index.html";
     (void) request;
     response->status_code = 200;
+    response->serving_type = SERVE_STATIC;
     str_alloc_and_copy(&(response->file_location), index_location);
 }
 
@@ -41,6 +48,24 @@ void staticHandler(HTTP_Request *request, HTTP_Response *response)
     /* "+ 1" is to remove the initial slash*/
     str_alloc_and_copy(&(response->file_location), request->target + 1);
     response->status_code = check_file_availability(response->file_location);
+    response->serving_type = SERVE_STATIC;
+}
+
+void faviconHandler(HTTP_Request *request, HTTP_Response *response)
+{
+    static char favicon_location[] = "static/favicon.ico";
+    (void) request;
+
+    str_alloc_and_copy(&(response->file_location), favicon_location);
+    response->status_code = 200;
+    response->serving_type = SERVE_STATIC;
+}
+
+void templateHandler(HTTP_Request *request, HTTP_Response *response)
+{
+    str_alloc_and_copy(&(response->file_location), request->target + 1);
+    response->status_code = check_file_availability(response->file_location);
+    response->serving_type = SERVE_TEMPLATE;
 }
 
 void send_HTTP_startline(int filed, int code)
