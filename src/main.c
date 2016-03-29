@@ -11,14 +11,14 @@
 int main(int argc, char **argv)
 {
     int port = 80;
-    HTTPServer server;
+    HTTP_Server server;
     if (argc > 1) {
         port = atoi(argv[1]);
     }
     init_handlers();
-    init_HTTPServer(&server, port, 0);
-    run_HTTPServer(&server);
-    close_HTTPServer(&server);
+    init_HTTP_Server(&server, port, 0);
+    run_HTTP_Server(&server);
+    close_HTTP_Server(&server);
     fin_handlers();
     return EXIT_SUCCESS;
 }

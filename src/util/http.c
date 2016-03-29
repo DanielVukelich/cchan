@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
+#include <assert.h>
 
 /* don't print more than 80 characters */
 #define MAX_BACKWARDS 40
@@ -49,7 +50,7 @@ void point_error_in_line(char buffer[], int currentpos)
     puts(line);
 }
 
-http_method get_http_method(char str[])
+HTTP_Method get_HTTP_Method(char str[])
 {
     if (strcmp(str, "GET") == 0) {
         return GET;

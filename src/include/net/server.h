@@ -4,15 +4,15 @@
 #include <netinet/in.h>
 
 typedef struct {
-    struct sockaddr_in server_info;
-    int server_socket;
+    struct sockaddr_in info;
+    int socket;
     int flags;
     short port;
-} HTTPServer;
+} HTTP_Server;
 
-void init_HTTPServer(HTTPServer *server, short port, int flags);
+void init_HTTP_Server(HTTP_Server *server, short port, int flags);
 
-void run_HTTPServer(HTTPServer *server);
+void run_HTTP_Server(HTTP_Server *server);
 
-void close_HTTPServer(HTTPServer *server);
+void close_HTTP_Server(HTTP_Server *server);
 

@@ -11,7 +11,11 @@ The fastest meme sharing service ever.
 No installation atm, just play with the files the way it works tbqh lad
 
 ### RUN
-Once compiled, run "./cchan".
-NOTE: this does nothing but accept a connection and return a "Index" html file or SIGSEGV.
+Once compiled, run "./cchan [port number]". Default port is 80, so you might need root access. 
+If you don't want to or can't run cchan as root, provide a port number you're allowed to use.
+C-chan currently does:
+* Static file serving. Files must be in the static/ directory, and are accessed with the following URI: "/static/path_to_your_file"
+* favicon.ico. File "favicon.ico" is served from the static/directory
+* index. At URI "/", it statically serves static/index.html
 
 COPYRIGHT (C) 2016 the C-chan contributors.
